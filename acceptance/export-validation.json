@@ -1,0 +1,18 @@
+{
+  "modelVersion": "0.2.0",
+  "format": "2.0",
+  "bytes": 19027428,
+  "uniqueSeats": 1811,
+  "nodes": 10894,
+  "meshDefinitions": 29,
+  "bufferBounds": "pass",
+  "seatIdentityCoverage": "pass",
+  "failures": [],
+  "browserReimport": {
+    "loader": "Three.js GLTFLoader 0.180.0",
+    "meshes": 10889,
+    "texturedMeshes": 9063,
+    "uniqueSeatIds": 1811,
+    "pass": true
+  }
+}

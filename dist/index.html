@@ -1,0 +1,300 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#121513" />
+    <title>梅溪湖大剧院 · 座位视角</title>
+    <meta
+      name="description"
+      content="探索梅溪湖大剧院主剧场内部，选择座位，查看坐姿观演视角。依据公开图纸与照片重建，含数据依据说明。"
+    />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='24' fill='%23191e1a'/%3E%3Cpath d='M20 65V36Q50 8 80 36V65M30 65V42Q50 23 70 42V65M41 65V47Q50 36 59 47V65' fill='none' stroke='%23d9bf8d' stroke-width='5'/%3E%3C/svg%3E"
+    />
+    <link rel="stylesheet" href="/style.css" />
+    <script type="importmap">
+      { "imports": { "three": "/vendor/three.module.js" } }
+    </script>
+  </head>
+  <body>
+    <main id="app">
+      <div id="viewport" aria-label="主剧场三维视图">
+        <div id="loading">
+          <span class="loader-orbit"></span><b>正在点亮剧场</b
+          ><small>加载座位与室内模型</small>
+        </div>
+      </div>
+      <header class="topbar">
+        <a class="brand" href="/" aria-label="梅溪湖大剧院座位视角首页"
+          ><svg viewBox="0 0 42 42" aria-hidden="true">
+            <path
+              d="M5 31V15Q21-4 37 15v16M12 31V18Q21 5 30 18v13M19 31V21q2-5 4 0v10"
+            /></svg
+          ><span>梅溪湖大剧院<small>MEIXIHU · SEAT VIEW</small></span></a
+        >
+        <div class="header-center">
+          <span class="live-dot"></span> 主剧场 · 三维观演
+        </div>
+        <div class="header-actions">
+          <button id="reference-open" class="button subtle">
+            <span aria-hidden="true">▧</span> 对照实景</button
+          ><button
+            id="info-open"
+            class="icon-button"
+            aria-label="查看模型依据与精度"
+          >
+            i
+          </button>
+        </div>
+      </header>
+      <aside class="seat-panel" aria-label="座位选择">
+        <div class="panel-title">
+          <span class="eyebrow">FIND YOUR PERSPECTIVE</span>
+          <div>
+            <h1>从这里，看见舞台。</h1>
+            <button
+              id="panel-toggle"
+              class="icon-button"
+              aria-label="收起选座面板"
+              aria-expanded="true"
+            >
+              −
+            </button>
+          </div>
+          <p>选一个座位，走进你的观演位置。</p>
+        </div>
+        <div id="panel-body">
+          <div class="floor-tabs" role="tablist" aria-label="观众席楼层">
+            <button
+              role="tab"
+              id="floor-1F"
+              data-floor="1F"
+              aria-selected="true"
+            >
+              一层<span>池座</span></button
+            ><button
+              role="tab"
+              id="floor-2F"
+              data-floor="2F"
+              aria-selected="false"
+            >
+              二层<span>楼座</span></button
+            ><button
+              role="tab"
+              id="floor-3F"
+              data-floor="3F"
+              aria-selected="false"
+            >
+              三层<span>楼座</span>
+            </button>
+          </div>
+          <div class="map-heading">
+            <span id="floor-count"></span
+            ><button id="map-expand" class="text-button">放大选座图 ↗</button>
+          </div>
+          <div id="seatmap-container" class="seatmap-container"></div>
+          <div class="map-legend">
+            <span><i class="dot available"></i>可选座位</span
+            ><span><i class="dot selected"></i>当前座位</span
+            ><span>↑ 舞台方向</span>
+          </div>
+          <div class="seat-form">
+            <label
+              >区域<select
+                id="zone-select"
+                aria-label="选择区域"
+              ></select></label
+            ><label
+              >排<select id="row-select" aria-label="选择排"></select></label
+            ><label
+              >座<select id="number-select" aria-label="选择座"></select
+            ></label>
+          </div>
+          <button id="go-seat" class="button primary">
+            <span aria-hidden="true">◎</span> 查看这个座位的视角
+            <span aria-hidden="true">→</span>
+          </button>
+          <p class="numbering-note">当前使用重建编号 · 票面座号尚待核对</p>
+          <div class="panel-footer">
+            <span>探索其他位置</span>
+            <div>
+              <button
+                id="seat-prev"
+                class="icon-button"
+                aria-label="上一个座位"
+              >
+                ←</button
+              ><button
+                id="seat-next"
+                class="icon-button"
+                aria-label="下一个座位"
+              >
+                →</button
+              ><button id="random-seat" class="text-button">随机入座 ↗</button>
+            </div>
+          </div>
+        </div>
+      </aside>
+      <nav class="view-tabs" aria-label="视图模式">
+        <button id="mode-seat" class="active" aria-pressed="true">
+          ◎ 座位视角</button
+        ><button id="mode-overview" aria-pressed="false">◇ 剧场总览</button>
+      </nav>
+      <section class="seat-card" aria-label="当前座位信息" aria-live="polite">
+        <span class="eyebrow">YOUR SEAT</span>
+        <h2 id="selected-label">正在载入</h2>
+        <div class="seat-metrics">
+          <span>距台口 <strong id="seat-distance">—</strong></span
+          ><span>眼点标高 <strong id="seat-elevation">—</strong></span>
+        </div>
+        <span id="seat-id" class="seat-id"></span>
+      </section>
+      <div class="viewer-tools">
+        <button id="reset-view" class="tool-button" aria-label="重新面向舞台">
+          ⌖<span>面向舞台</span></button
+        ><button id="look-back" class="tool-button" aria-label="回望观众厅">
+          ↶<span>回望观众厅</span></button
+        ><button id="lighting-toggle" class="tool-button" aria-pressed="false">
+          ☼<span>观众厅灯光</span></button
+        ><button id="settings-open" class="tool-button">
+          ⚙<span>视角设置</span></button
+        ><button id="fullscreen" class="tool-button">⛶<span>全屏</span></button>
+      </div>
+      <div class="viewer-hint" id="viewer-hint">
+        <span aria-hidden="true">↔</span> 拖动转头 · 滚轮调整视野
+      </div>
+      <footer class="bottom-bar">
+        <button id="provenance-open">
+          <i class="status-dot"></i>依据公开资料重建
+          <span>· 尺寸待校准</span> ⓘ</button
+        ><span id="render-status">正在加载场景</span>
+      </footer>
+      <div id="toast" role="status"></div>
+    </main>
+    <dialog id="settings-dialog" class="small-dialog">
+      <div class="dialog-heading">
+        <h2>视角设置</h2>
+        <button data-close class="icon-button" aria-label="关闭设置">×</button>
+      </div>
+      <p>所有座位共用同一套视角参数，便于比较。</p>
+      <label class="range-label"
+        >坐姿眼高 <output id="eye-output">116 cm</output
+        ><input
+          id="eye-height"
+          type="range"
+          min="95"
+          max="140"
+          value="116"
+          step="1" /></label
+      ><label class="range-label"
+        >垂直视场角 <output id="fov-output">55°</output
+        ><input
+          id="fov"
+          type="range"
+          min="35"
+          max="85"
+          value="55"
+          step="1" /></label
+      ><label class="check-label"
+        ><input
+          id="actor-toggle"
+          type="checkbox"
+          checked
+        />显示舞台人物，辅助感知比例</label
+      ><label class="check-label"
+        ><input
+          id="pit-toggle"
+          type="checkbox"
+          checked
+        />显示乐池活动座椅</label
+      >
+      <div class="dialog-note">
+        眼高相对于所在座位地坪。这里展示空场视角，不包含前排观众身体造成的遮挡。
+      </div>
+      <button id="settings-reset" class="button subtle">恢复默认参数</button>
+    </dialog>
+    <dialog id="reference-dialog" class="reference-dialog">
+      <div class="dialog-heading">
+        <div>
+          <span class="eyebrow">VISUAL REFERENCES</span>
+          <h2>对照真实的梅溪湖</h2>
+        </div>
+        <button data-close class="icon-button" aria-label="关闭实景对照">
+          ×
+        </button>
+      </div>
+      <div class="reference-tabs">
+        <button data-reference="auditorium-front.jpg" class="active">
+          舞台望向观众席</button
+        ><button data-reference="auditorium-back.jpg">观众厅与顶棚</button
+        ><button data-reference="section-long.jpg">纵剖面</button
+        ><button data-reference="plan-2f.jpg">建筑平面</button
+        ><button data-reference="seating-all.jpg">全厅座位图</button>
+      </div>
+      <img
+        id="reference-image"
+        src="/reference/auditorium-front.jpg"
+        alt="梅溪湖大剧院观众厅实景，摄影Virgile Simon Bertrand"
+      />
+      <p id="reference-caption">
+        实景摄影 © Virgile Simon Bertrand / ZHA ·
+        公开发表资料，不代表模型已实测校准。
+      </p>
+    </dialog>
+    <dialog id="info-dialog" class="info-dialog">
+      <div class="dialog-heading">
+        <div>
+          <span class="eyebrow">MODEL NOTES</span>
+          <h2>模型依据与当前精度</h2>
+        </div>
+        <button data-close class="icon-button" aria-label="关闭模型说明">
+          ×
+        </button>
+      </div>
+      <div class="notice">
+        这是依据公开图纸与实景照片建立的三维重建模型。座位布局、尺寸和坐姿眼点仍含估算，不能作为真实座位视线的测量证明。
+      </div>
+      <dl>
+        <dt>形态依据</dt>
+        <dd>
+          ZHA公开平面与剖面、观众厅摄影；重建木色墙顶面、曲线灯带、池座和两层楼座。
+        </dd>
+        <dt>座位依据</dt>
+        <dd>
+          主座区的1681个位置由公开座位图逐排描点；另有130个按容量重建的乐池活动位置。共1811个位置均可选择。排号和座号为重建编号，不等同于已核对的票面编号。
+        </dd>
+        <dt>尺寸依据</dt>
+        <dd>
+          以台口、剖面层级和照片比例建立可调整几何。排距、逐排高程、栏板高度等仍需实测或竣工图校准。
+        </dd>
+        <dt>视角范围</dt>
+        <dd>
+          相机固定在所选座位的坐姿眼点，可左右转头、抬头、低头；显示模型几何的遮挡，默认不含观众。
+        </dd>
+      </dl>
+      <div id="source-links"></div>
+      <button id="export-seat-data" class="button subtle">
+        下载当前座位坐标 JSON ↓</button
+      ><button id="export-model" class="button subtle">
+        导出当前三维模型 GLB ↓
+      </button>
+      <p class="export-note" id="export-status"></p>
+    </dialog>
+    <dialog id="map-dialog" class="map-dialog">
+      <div class="dialog-heading">
+        <div>
+          <span class="eyebrow">CHOOSE A SEAT</span>
+          <h2 id="expanded-map-title">放大选座图</h2>
+        </div>
+        <button data-close class="icon-button" aria-label="关闭放大座位图">
+          ×
+        </button>
+      </div>
+      <div id="expanded-seatmap"></div>
+      <p>点击任意圆点入座。当前标注为重建编号。</p>
+    </dialog>
+    <script type="module" src="/src/app.js"></script>
+  </body>
+</html>

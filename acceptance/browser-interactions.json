@@ -1,0 +1,513 @@
+{
+  "modelVersion": "0.2.0",
+  "checks": [
+    {
+      "name": "floor 1F",
+      "pass": true,
+      "detail": {
+        "s": {
+          "ready": true,
+          "mode": "seat",
+          "floor": "1F",
+          "selected": "1F-M-12-25",
+          "eye": [
+            -0.25485460082163797,
+            1.9249999999999998,
+            17.34020039312771
+          ],
+          "expectedEye": [
+            -0.25485460082163797,
+            1.9249999999999998,
+            17.34020039312771
+          ],
+          "quaternion": [
+            -0.016218631575005357,
+            -0.005702917592348193,
+            -0.00009250719178861047,
+            0.9998522011593457
+          ],
+          "fov": 55,
+          "height": 1.16,
+          "pit": true,
+          "errors": [],
+          "transitioning": false,
+          "render": {
+            "fps": 8,
+            "lastRenderMs": 0.8999999761581421,
+            "calls": 29,
+            "triangles": 638767
+          },
+          "dimensions": {
+            "width": 1674,
+            "height": 939
+          },
+          "modelVersion": "0.2.0"
+        },
+        "circleCount": 1196
+      }
+    },
+    {
+      "name": "floor 2F",
+      "pass": true,
+      "detail": {
+        "s": {
+          "ready": true,
+          "mode": "seat",
+          "floor": "2F",
+          "selected": "2F-M-08-17",
+          "eye": [
+            -0.3382968040378287,
+            7.3535900000000005,
+            26.73799113634524
+          ],
+          "expectedEye": [
+            -0.3382968040378287,
+            7.3535900000000005,
+            26.73799113634524
+          ],
+          "quaternion": [
+            -0.0956025996932352,
+            -0.005304886361179997,
+            -0.0005095019279720751,
+            0.9954053151959636
+          ],
+          "fov": 55,
+          "height": 1.16,
+          "pit": true,
+          "errors": [],
+          "transitioning": false,
+          "render": {
+            "fps": 8,
+            "lastRenderMs": 0.6000000238418579,
+            "calls": 29,
+            "triangles": 638767
+          },
+          "dimensions": {
+            "width": 1674,
+            "height": 939
+          },
+          "modelVersion": "0.2.0"
+        },
+        "circleCount": 318
+      }
+    },
+    {
+      "name": "floor 3F",
+      "pass": true,
+      "detail": {
+        "s": {
+          "ready": true,
+          "mode": "seat",
+          "floor": "3F",
+          "selected": "3F-M-08-15",
+          "eye": [
+            -0.3339374034650129,
+            11.03536,
+            27.978101026160225
+          ],
+          "expectedEye": [
+            -0.3339374034650129,
+            11.03536,
+            27.978101026160225
+          ],
+          "quaternion": [
+            -0.14440473424651987,
+            -0.005009756513498213,
+            -0.0007311049519502553,
+            0.989505755694436
+          ],
+          "fov": 55,
+          "height": 1.16,
+          "pit": true,
+          "errors": [],
+          "transitioning": false,
+          "render": {
+            "fps": 16,
+            "lastRenderMs": 0.3999999761581421,
+            "calls": 29,
+            "triangles": 638767
+          },
+          "dimensions": {
+            "width": 1674,
+            "height": 939
+          },
+          "modelVersion": "0.2.0"
+        },
+        "circleCount": 297
+      }
+    },
+    {
+      "name": "exact form selection",
+      "pass": true,
+      "detail": {
+        "ready": true,
+        "mode": "seat",
+        "floor": "3F",
+        "selected": "3F-R-07-04",
+        "eye": [
+          16.11909375864886,
+          10.65844,
+          21.31686491156183
+        ],
+        "expectedEye": [
+          16.11909375864886,
+          10.65844,
+          21.31686491156183
+        ],
+        "quaternion": [
+          -0.1425925792517371,
+          0.2683411580404976,
+          0.04019846402653732,
+          0.951863678650325
+        ],
+        "fov": 55,
+        "height": 1.16,
+        "pit": true,
+        "errors": [],
+        "transitioning": false,
+        "render": {
+          "fps": 6,
+          "lastRenderMs": 0.6999999284744263,
+          "calls": 29,
+          "triangles": 638767
+        },
+        "dimensions": {
+          "width": 1674,
+          "height": 939
+        },
+        "modelVersion": "0.2.0"
+      }
+    },
+    {
+      "name": "enlarged seat map selection",
+      "pass": true,
+      "detail": {
+        "ready": true,
+        "mode": "seat",
+        "floor": "3F",
+        "selected": "3F-M-05-15",
+        "eye": [
+          -0.3785342078243801,
+          9.578,
+          23.476341766215004
+        ],
+        "expectedEye": [
+          -0.3785342078243786,
+          9.578,
+          23.476341766215004
+        ],
+        "quaternion": [
+          -0.14256527490094098,
+          -0.006578138453708313,
+          -0.000947513730549016,
+          0.9897630891807563
+        ],
+        "fov": 55,
+        "height": 1.16,
+        "pit": true,
+        "errors": [],
+        "transitioning": false,
+        "render": {
+          "fps": 6,
+          "lastRenderMs": 0.30000007152557373,
+          "calls": 29,
+          "triangles": 638767
+        },
+        "dimensions": {
+          "width": 1674,
+          "height": 939
+        },
+        "modelVersion": "0.2.0"
+      }
+    },
+    {
+      "name": "eye-height control",
+      "pass": true,
+      "detail": {
+        "ready": true,
+        "mode": "seat",
+        "floor": "3F",
+        "selected": "3F-M-05-15",
+        "eye": [
+          -0.3785342078243786,
+          9.367999999999999,
+          23.476341766215004
+        ],
+        "expectedEye": [
+          -0.3785342078243786,
+          9.367999999999999,
+          23.476341766215004
+        ],
+        "quaternion": [
+          -0.14256527490094098,
+          -0.006578138453708313,
+          -0.000947513730549016,
+          0.9897630891807563
+        ],
+        "fov": 55,
+        "height": 0.95,
+        "pit": true,
+        "errors": [],
+        "transitioning": false,
+        "render": {
+          "fps": 6,
+          "lastRenderMs": 0.3999999761581421,
+          "calls": 29,
+          "triangles": 638767
+        },
+        "dimensions": {
+          "width": 1674,
+          "height": 939
+        },
+        "modelVersion": "0.2.0"
+      }
+    },
+    {
+      "name": "FOV control",
+      "pass": true,
+      "detail": {
+        "ready": true,
+        "mode": "seat",
+        "floor": "3F",
+        "selected": "3F-M-05-15",
+        "eye": [
+          -0.3785342078243786,
+          9.367999999999999,
+          23.476341766215004
+        ],
+        "expectedEye": [
+          -0.3785342078243786,
+          9.367999999999999,
+          23.476341766215004
+        ],
+        "quaternion": [
+          -0.14256527490094098,
+          -0.006578138453708313,
+          -0.000947513730549016,
+          0.9897630891807563
+        ],
+        "fov": 85,
+        "height": 0.95,
+        "pit": true,
+        "errors": [],
+        "transitioning": false,
+        "render": {
+          "fps": 6,
+          "lastRenderMs": 0.3999999761581421,
+          "calls": 29,
+          "triangles": 638767
+        },
+        "dimensions": {
+          "width": 1674,
+          "height": 939
+        },
+        "modelVersion": "0.2.0"
+      }
+    },
+    {
+      "name": "pit 130-seat visibility",
+      "pass": true,
+      "detail": {
+        "visible": 1066
+      }
+    },
+    {
+      "name": "head rotation keeps eye fixed",
+      "pass": true,
+      "detail": {
+        "before": {
+          "ready": true,
+          "mode": "seat",
+          "floor": "1F",
+          "selected": "1F-M-12-25",
+          "eye": [
+            -0.25485460082163797,
+            1.9249999999999998,
+            17.34020039312771
+          ],
+          "expectedEye": [
+            -0.25485460082163797,
+            1.9249999999999998,
+            17.34020039312771
+          ],
+          "quaternion": [
+            -0.011523073484697374,
+            -0.005703289129038112,
+            -0.00006572485255081086,
+            0.9999173400590773
+          ],
+          "fov": 55,
+          "height": 1.16,
+          "pit": true,
+          "errors": [],
+          "transitioning": false,
+          "render": {
+            "fps": 1,
+            "lastRenderMs": 1.2999999523162842,
+            "calls": 29,
+            "triangles": 638767
+          },
+          "dimensions": {
+            "width": 1674,
+            "height": 939
+          },
+          "modelVersion": "0.2.0"
+        },
+        "after": {
+          "ready": true,
+          "mode": "seat",
+          "floor": "1F",
+          "selected": "1F-M-12-25",
+          "eye": [
+            -0.25485460082163797,
+            1.9249999999999998,
+            17.34020039312771
+          ],
+          "expectedEye": [
+            -0.25485460082163797,
+            1.9249999999999998,
+            17.34020039312771
+          ],
+          "quaternion": [
+            -0.07498620461011621,
+            -0.24927177015288046,
+            -0.0193632299316552,
+            0.9653319216982483
+          ],
+          "fov": 55,
+          "height": 1.16,
+          "pit": true,
+          "errors": [],
+          "transitioning": false,
+          "render": {
+            "fps": 1,
+            "lastRenderMs": 0.5,
+            "calls": 29,
+            "triangles": 638767
+          },
+          "dimensions": {
+            "width": 1674,
+            "height": 939
+          },
+          "modelVersion": "0.2.0"
+        }
+      }
+    },
+    {
+      "name": "overview returns to chosen eye and FOV",
+      "pass": true,
+      "detail": {
+        "ready": true,
+        "mode": "seat",
+        "floor": "1F",
+        "selected": "1F-M-12-25",
+        "eye": [
+          -0.2548546008216377,
+          1.9249999999999972,
+          17.34020039312771
+        ],
+        "expectedEye": [
+          -0.25485460082163797,
+          1.9249999999999998,
+          17.34020039312771
+        ],
+        "quaternion": [
+          -0.016218631575005357,
+          -0.005702917592348193,
+          -0.00009250719178861047,
+          0.9998522011593457
+        ],
+        "fov": 55,
+        "height": 1.16,
+        "pit": true,
+        "errors": [],
+        "transitioning": false,
+        "render": {
+          "fps": 1,
+          "lastRenderMs": 1.100000023841858,
+          "calls": 29,
+          "triangles": 638767
+        },
+        "dimensions": {
+          "width": 1674,
+          "height": 939
+        },
+        "modelVersion": "0.2.0"
+      }
+    },
+    {
+      "name": "deep link",
+      "pass": true,
+      "detail": {
+        "ready": true,
+        "mode": "seat",
+        "floor": "2F",
+        "selected": "2F-R-06-09",
+        "eye": [
+          17.468369603315242,
+          6.91776,
+          16.730861890463476
+        ],
+        "expectedEye": [
+          17.468369603315242,
+          6.91776,
+          16.730861890463476
+        ],
+        "quaternion": [
+          -0.09523188629678746,
+          0.33041544375218745,
+          0.0335309180548966,
+          0.9384200551441751
+        ],
+        "fov": 55,
+        "height": 1.16,
+        "pit": true,
+        "errors": [],
+        "transitioning": false,
+        "render": {
+          "fps": 0,
+          "lastRenderMs": 1.100000023841858,
+          "calls": 29,
+          "triangles": 638767
+        },
+        "dimensions": {
+          "width": 1674,
+          "height": 939
+        },
+        "modelVersion": "0.2.0"
+      }
+    },
+    {
+      "name": "all camera positions",
+      "pass": true,
+      "detail": {
+        "checked": 1811,
+        "uniqueEyes": 1811,
+        "failures": []
+      }
+    },
+    {
+      "name": "all seats supported by geometry",
+      "pass": true,
+      "detail": {
+        "checked": 1811,
+        "failures": []
+      }
+    },
+    {
+      "name": "mobile viewport fits",
+      "pass": true,
+      "detail": {
+        "innerWidth": 390,
+        "scrollWidth": 390
+      }
+    },
+    {
+      "name": "mobile panel collapses",
+      "pass": true,
+      "detail": {
+        "collapsed": true
+      }
+    }
+  ]
+}

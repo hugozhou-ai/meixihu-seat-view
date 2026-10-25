@@ -1,0 +1,69 @@
+{
+  "modelVersion": "0.2.0",
+  "floor": {
+    "checked": 1811,
+    "failures": []
+  },
+  "camera": {
+    "checked": 1811,
+    "uniqueEyes": 1811,
+    "failures": []
+  },
+  "canvasClick": {
+    "expected": "1F-P-01-22",
+    "actual": "1F-P-01-22",
+    "pass": true
+  },
+  "smallMap": {
+    "expected": "2F-M-08-15",
+    "actual": "2F-M-08-15",
+    "pass": true
+  },
+  "references": {
+    "loaded": 5,
+    "total": 5
+  },
+  "mobile": {
+    "width": 390,
+    "scrollWidth": 390,
+    "collapsed": true
+  },
+  "state": {
+    "ready": true,
+    "mode": "seat",
+    "floor": "2F",
+    "selected": "2F-M-08-15",
+    "eye": [
+      -1.89032870557046,
+      7.1976,
+      26.67735551108638
+    ],
+    "expectedEye": [
+      -1.89032870557046,
+      7.1976,
+      26.67735551108638
+    ],
+    "quaternion": [
+      -0.09322009245025352,
+      -0.02966760322386798,
+      -0.0027789569862329577,
+      0.9951995403337895
+    ],
+    "fov": 55,
+    "height": 1.16,
+    "pit": true,
+    "errors": [],
+    "transitioning": false,
+    "render": {
+      "fps": 1,
+      "lastRenderMs": 0.20000004768371582,
+      "calls": 29,
+      "triangles": 638767
+    },
+    "dimensions": {
+      "width": 1674,
+      "height": 939
+    },
+    "modelVersion": "0.2.0"
+  }
+}
