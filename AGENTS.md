@@ -2,6 +2,10 @@
 
 本文件适用于仓库内所有代码，供 Codex 等 coding agent 执行。
 
+## 项目公共 Skill
+
+- 搜集剧场图纸/座位资料、新增剧场室内模型或校准逐座视角时，使用 [theatre-reconstruction](.agents/skills/theatre-reconstruction/SKILL.md)。该 skill 随仓库共享，不用于普通界面改版。
+
 ## 统一图标库
 
 - 所有界面图标统一使用 **Lucide**，当前依赖为锁定版本的 `lucide-static`。不得混用其他图标库。
