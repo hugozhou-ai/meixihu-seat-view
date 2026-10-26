@@ -1,0 +1,81 @@
+{
+  "feature": "natural seat view",
+  "defaultVerticalFov": 75,
+  "zoom": 1,
+  "checks": [
+    {
+      "name": "initial natural view",
+      "pass": true,
+      "fov": 75,
+      "zoom": 1,
+      "seat": "1F-M-21-27"
+    },
+    {
+      "name": "seat wheel preserves eye and FOV",
+      "pass": true
+    },
+    {
+      "name": "seat change preserves natural view",
+      "pass": true
+    },
+    {
+      "name": "overview still permits zoom",
+      "pass": true
+    },
+    {
+      "name": "overview return restores seated eye and natural FOV",
+      "pass": true
+    },
+    {
+      "name": "natural-view button restores manual magnification",
+      "pass": true
+    },
+    {
+      "name": "settings reset restores natural defaults",
+      "pass": true
+    },
+    {
+      "name": "Home key restores natural view",
+      "pass": true
+    }
+  ],
+  "final": {
+    "ready": true,
+    "mode": "seat",
+    "floor": "2F",
+    "selected": "2F-M-08-17",
+    "eye": [
+      -0.3382968040378287,
+      7.3535900000000005,
+      26.73799113634524
+    ],
+    "expectedEye": [
+      -0.3382968040378287,
+      7.3535900000000005,
+      26.73799113634524
+    ],
+    "quaternion": [
+      -0.0956025996932352,
+      -0.005304886361179997,
+      -0.0005095019279720751,
+      0.9954053151959636
+    ],
+    "fov": 75,
+    "zoom": 1,
+    "height": 1.16,
+    "pit": true,
+    "errors": [],
+    "transitioning": false,
+    "render": {
+      "fps": 1,
+      "lastRenderMs": 0.5,
+      "calls": 29,
+      "triangles": 638767
+    },
+    "dimensions": {
+      "width": 1674,
+      "height": 939
+    },
+    "modelVersion": "0.2.0"
+  }
+}

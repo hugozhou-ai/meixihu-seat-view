@@ -152,8 +152,8 @@
         <span id="seat-id" class="seat-id"></span>
       </section>
       <div class="viewer-tools">
-        <button id="reset-view" class="tool-button" aria-label="重新面向舞台">
-          ⌖<span>面向舞台</span></button
+        <button id="reset-view" class="tool-button" aria-label="恢复自然视角并面向舞台">
+          ⌖<span>自然视角</span></button
         ><button id="look-back" class="tool-button" aria-label="回望观众厅">
           ↶<span>回望观众厅</span></button
         ><button id="lighting-toggle" class="tool-button" aria-pressed="false">
@@ -163,7 +163,7 @@
         ><button id="fullscreen" class="tool-button">⛶<span>全屏</span></button>
       </div>
       <div class="viewer-hint" id="viewer-hint">
-        <span aria-hidden="true">↔</span> 拖动转头 · 滚轮调整视野
+        <span aria-hidden="true">↔</span> 拖动转头 · 自然观演视角
       </div>
       <footer class="bottom-bar">
         <button id="provenance-open">
@@ -178,7 +178,7 @@
         <h2>视角设置</h2>
         <button data-close class="icon-button" aria-label="关闭设置">×</button>
       </div>
-      <p>所有座位共用同一套视角参数，便于比较。</p>
+      <p>默认采用 75° 自然视野。可手动调整，所有座位共用相同参数。</p>
       <label class="range-label"
         >坐姿眼高 <output id="eye-output">116 cm</output
         ><input
@@ -189,13 +189,13 @@
           value="116"
           step="1" /></label
       ><label class="range-label"
-        >垂直视场角 <output id="fov-output">55°</output
+        >垂直视场角 <output id="fov-output">75°</output
         ><input
           id="fov"
           type="range"
           min="35"
           max="85"
-          value="55"
+          value="75"
           step="1" /></label
       ><label class="check-label"
         ><input

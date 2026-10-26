@@ -12,6 +12,7 @@ import {
   MODEL_VERSION,
 } from "./layout.js";
 import { buildTheatre } from "./theatre.js";
+const DEFAULT_FOV = 75;
 const $ = (s) => document.querySelector(s);
 const seats = makeLayout();
 const seatById = new Map(
@@ -22,7 +23,7 @@ const state = {
   floor: "1F",
   selected: null,
   height: 1.16,
-  fov: 55,
+  fov: DEFAULT_FOV,
   lighting: "house",
   pit: true,
   yaw: 0,
@@ -186,7 +187,7 @@ function updateMode() {
   }
   $("#viewer-hint").innerHTML =
     state.mode === "seat"
-      ? '<span aria-hidden="true">↔</span> 拖动转头 · 滚轮调整视野'
+      ? '<span aria-hidden="true">↔</span> 拖动转头 · 自然观演视角'
       : '<span aria-hidden="true">↔</span> 拖动旋转 · 滚轮缩放 · 点击座椅入座';
 }
 function setOverview() {
@@ -382,7 +383,13 @@ $("#random-seat").addEventListener("click", () => {
 });
 $("#mode-overview").addEventListener("click", setOverview);
 $("#mode-seat").addEventListener("click", () => goToSeat(state.selected));
-$("#reset-view").addEventListener("click", () => goToSeat(state.selected));
+function restoreNaturalView() {
+  camera.zoom = 1;
+  setFov(DEFAULT_FOV);
+  goToSeat(state.selected);
+  toast("已恢复自然视角");
+}
+$("#reset-view").addEventListener("click", restoreNaturalView);
 $("#look-back").addEventListener("click", () => {
   if (state.mode === "overview") goToSeat(state.selected, { animate: false });
   transition = null;
@@ -538,7 +545,8 @@ function setPit(visible) {
 $("#pit-toggle").addEventListener("change", (e) => setPit(e.target.checked));
 $("#settings-reset").addEventListener("click", () => {
   setEyeHeight(1.16);
-  setFov(55);
+  camera.zoom = 1;
+  setFov(DEFAULT_FOV);
   $("#actor-toggle").checked = true;
   theatre.actor.visible = true;
   $("#pit-toggle").checked = true;
@@ -698,7 +706,6 @@ renderer.domElement.addEventListener(
   (e) => {
     if (state.mode === "seat") {
       e.preventDefault();
-      setFov(THREE.MathUtils.clamp(state.fov + e.deltaY * 0.025, 35, 85));
     }
   },
   { passive: false },
@@ -712,7 +719,7 @@ renderer.domElement.addEventListener("keydown", (e) => {
   e.preventDefault();
   transition = null;
   if (e.key === "Home") {
-    goToSeat(state.selected);
+    restoreNaturalView();
     return;
   }
   if (e.key === "ArrowLeft") state.yaw += 0.08;
@@ -793,6 +800,7 @@ window.__MEIXIHU__ = {
       expectedEye: seatEye(state.selected, state.height),
       quaternion: camera.quaternion.toArray(),
       fov: camera.fov,
+      zoom: camera.zoom,
       height: state.height,
       pit: state.pit,
       errors: state.errors,
