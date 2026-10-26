@@ -9,10 +9,7 @@
       name="description"
       content="探索剧场三维空间，选择座位，查看坐姿观演视角。收录梅溪湖大剧院与深圳保利剧院主剧场，依据公开图纸与照片重建。"
     />
-    <link
-      rel="icon"
-      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='24' fill='%23191e1a'/%3E%3Cpath d='M20 65V36Q50 8 80 36V65M30 65V42Q50 23 70 42V65M41 65V47Q50 36 59 47V65' fill='none' stroke='%23d9bf8d' stroke-width='5'/%3E%3C/svg%3E"
-    />
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
     <link rel="stylesheet" href="./style.css" />
     <script type="importmap">
       { "imports": { "three": "./vendor/three.module.js" } }
@@ -28,11 +25,7 @@
       </div>
       <header class="topbar">
         <a class="brand" href="./" aria-label="剧场座位视角首页"
-          ><svg viewBox="0 0 42 42" aria-hidden="true">
-            <path
-              d="M5 31V15Q21-4 37 15v16M12 31V18Q21 5 30 18v13M19 31V21q2-5 4 0v10"
-            /></svg
-          ><span>剧场座位视角<small>THEATRE · SEAT VIEW</small></span></a
+          ><svg class="icon" data-icon="theater" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><use href="./icons.svg#theater"></use></svg><span>剧场座位视角<small>THEATRE · SEAT VIEW</small></span></a
         >
         <div class="header-center">
           <span class="live-dot"></span>
@@ -40,13 +33,13 @@
         </div>
         <div class="header-actions">
           <button id="reference-open" class="button subtle">
-            <span aria-hidden="true">▧</span> 对照实景</button
+            <svg class="icon" data-icon="images" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><use href="./icons.svg#images"></use></svg> 对照实景</button
           ><button
             id="info-open"
             class="icon-button"
             aria-label="查看模型依据与精度"
           >
-            i
+            <svg class="icon" data-icon="info" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><use href="./icons.svg#info"></use></svg>
           </button>
         </div>
       </header>
@@ -64,7 +57,7 @@
               aria-label="收起选座面板"
               aria-expanded="true"
             >
-              −
+              <svg class="icon" data-icon="minus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><use href="./icons.svg#minus"></use></svg>
             </button>
           </div>
           <p>选一个座位，走进你的观演位置。</p>
@@ -96,13 +89,15 @@
           </div>
           <div class="map-heading">
             <span id="floor-count"></span
-            ><button id="map-expand" class="text-button">放大选座图 ↗</button>
+            ><button id="map-expand" class="text-button">
+              放大选座图 <svg class="icon" data-icon="expand" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><use href="./icons.svg#expand"></use></svg>
+            </button>
           </div>
           <div id="seatmap-container" class="seatmap-container"></div>
           <div class="map-legend">
             <span><i class="dot available"></i>可选座位</span
             ><span><i class="dot selected"></i>当前座位</span
-            ><span>↑ 舞台方向</span>
+            ><span><svg class="icon" data-icon="arrow-up" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><use href="./icons.svg#arrow-up"></use></svg> 舞台方向</span>
           </div>
           <div class="seat-form">
             <label
@@ -117,8 +112,8 @@
             ></label>
           </div>
           <button id="go-seat" class="button primary">
-            <span aria-hidden="true">◎</span> 查看这个座位的视角
-            <span aria-hidden="true">→</span>
+            <svg class="icon" data-icon="crosshair" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><use href="./icons.svg#crosshair"></use></svg> 查看这个座位的视角
+            <svg class="icon" data-icon="arrow-right" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><use href="./icons.svg#arrow-right"></use></svg>
           </button>
           <p class="numbering-note">当前使用重建编号 · 票面座号尚待核对</p>
           <div class="panel-footer">
@@ -129,22 +124,26 @@
                 class="icon-button"
                 aria-label="上一个座位"
               >
-                ←</button
+                <svg class="icon" data-icon="arrow-left" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><use href="./icons.svg#arrow-left"></use></svg></button
               ><button
                 id="seat-next"
                 class="icon-button"
                 aria-label="下一个座位"
               >
-                →</button
-              ><button id="random-seat" class="text-button">随机入座 ↗</button>
+                <svg class="icon" data-icon="arrow-right" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><use href="./icons.svg#arrow-right"></use></svg></button
+              ><button id="random-seat" class="text-button">
+                随机入座 <svg class="icon" data-icon="shuffle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><use href="./icons.svg#shuffle"></use></svg>
+              </button>
             </div>
           </div>
         </div>
       </aside>
       <nav class="view-tabs" aria-label="视图模式">
         <button id="mode-seat" class="active" aria-pressed="true">
-          ◎ 座位视角</button
-        ><button id="mode-overview" aria-pressed="false">◇ 剧场总览</button>
+          <svg class="icon" data-icon="armchair" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><use href="./icons.svg#armchair"></use></svg> 座位视角</button
+        ><button id="mode-overview" aria-pressed="false">
+          <svg class="icon" data-icon="box" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><use href="./icons.svg#box"></use></svg> 剧场总览
+        </button>
       </nav>
       <section class="seat-card" aria-label="当前座位信息" aria-live="polite">
         <span class="eyebrow" id="current-theatre-name">YOUR SEAT</span>
@@ -161,22 +160,24 @@
           class="tool-button"
           aria-label="恢复自然视角并面向舞台"
         >
-          ⌖<span>自然视角</span></button
+          <svg class="icon" data-icon="crosshair" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><use href="./icons.svg#crosshair"></use></svg><span>自然视角</span></button
         ><button id="look-back" class="tool-button" aria-label="回望观众厅">
-          ↶<span>回望观众厅</span></button
+          <svg class="icon" data-icon="rotate-ccw" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><use href="./icons.svg#rotate-ccw"></use></svg><span>回望观众厅</span></button
         ><button id="lighting-toggle" class="tool-button" aria-pressed="false">
-          ☼<span>观众厅灯光</span></button
+          <svg class="icon" data-icon="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><use href="./icons.svg#sun"></use></svg><span>观众厅灯光</span></button
         ><button id="settings-open" class="tool-button">
-          ⚙<span>视角设置</span></button
-        ><button id="fullscreen" class="tool-button">⛶<span>全屏</span></button>
+          <svg class="icon" data-icon="settings-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><use href="./icons.svg#settings-2"></use></svg><span>视角设置</span></button
+        ><button id="fullscreen" class="tool-button">
+          <svg class="icon" data-icon="maximize" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><use href="./icons.svg#maximize"></use></svg><span>全屏</span>
+        </button>
       </div>
       <div class="viewer-hint" id="viewer-hint">
-        <span aria-hidden="true">↔</span> 拖动转头 · 自然观演视角
+        <svg class="icon" data-icon="move-horizontal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><use href="./icons.svg#move-horizontal"></use></svg> 拖动转头 · 自然观演视角
       </div>
       <footer class="bottom-bar">
         <button id="provenance-open">
-          <i class="status-dot"></i>依据公开资料重建
-          <span>· 尺寸待校准</span> ⓘ</button
+          <i class="status-dot"></i>依据公开资料重建 <span>· 尺寸待校准</span>
+          <svg class="icon" data-icon="info" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><use href="./icons.svg#info"></use></svg></button
         ><span id="render-status">正在加载场景</span>
       </footer>
       <div id="toast" role="status"></div>
@@ -184,7 +185,9 @@
     <dialog id="settings-dialog" class="small-dialog">
       <div class="dialog-heading">
         <h2>视角设置</h2>
-        <button data-close class="icon-button" aria-label="关闭设置">×</button>
+        <button data-close class="icon-button" aria-label="关闭设置">
+          <svg class="icon" data-icon="x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><use href="./icons.svg#x"></use></svg>
+        </button>
       </div>
       <p>默认采用 75° 自然视野。可手动调整，所有座位共用相同参数。</p>
       <label class="range-label"
@@ -230,7 +233,7 @@
           <h2 id="reference-title">实景与资料对照</h2>
         </div>
         <button data-close class="icon-button" aria-label="关闭实景对照">
-          ×
+          <svg class="icon" data-icon="x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><use href="./icons.svg#x"></use></svg>
         </button>
       </div>
       <div class="reference-tabs"></div>
@@ -248,7 +251,7 @@
           <h2>模型依据与当前精度</h2>
         </div>
         <button data-close class="icon-button" aria-label="关闭模型说明">
-          ×
+          <svg class="icon" data-icon="x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><use href="./icons.svg#x"></use></svg>
         </button>
       </div>
       <div class="notice">
@@ -268,9 +271,9 @@
       </dl>
       <div id="source-links"></div>
       <button id="export-seat-data" class="button subtle">
-        下载当前座位坐标 JSON ↓</button
+        下载当前座位坐标 JSON <svg class="icon" data-icon="download" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><use href="./icons.svg#download"></use></svg></button
       ><button id="export-model" class="button subtle">
-        导出当前三维模型 GLB ↓
+        导出当前三维模型 GLB <svg class="icon" data-icon="download" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><use href="./icons.svg#download"></use></svg>
       </button>
       <p class="export-note" id="export-status"></p>
     </dialog>
@@ -281,7 +284,7 @@
           <h2 id="expanded-map-title">放大选座图</h2>
         </div>
         <button data-close class="icon-button" aria-label="关闭放大座位图">
-          ×
+          <svg class="icon" data-icon="x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><use href="./icons.svg#x"></use></svg>
         </button>
       </div>
       <div id="expanded-seatmap"></div>

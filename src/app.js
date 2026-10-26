@@ -1,3 +1,4 @@
+import { icon } from "./icons.js";
 import * as THREE from "three";
 import { OrbitControls } from "../vendor/OrbitControls.js";
 import { GLTFExporter } from "../vendor/GLTFExporter.js";
@@ -188,8 +189,8 @@ function updateMode() {
   }
   $("#viewer-hint").innerHTML =
     state.mode === "seat"
-      ? '<span aria-hidden="true">↔</span> 拖动转头 · 自然观演视角'
-      : '<span aria-hidden="true">↔</span> 拖动旋转 · 滚轮缩放 · 点击座椅入座';
+      ? `${icon("move-horizontal")} 拖动转头 · 自然观演视角`
+      : `${icon("move-horizontal")} 拖动旋转 · 滚轮缩放 · 点击座椅入座`;
 }
 function setOverview() {
   transition = null;
@@ -423,7 +424,7 @@ $("#fullscreen").addEventListener("click", async () => {
 $("#panel-toggle").addEventListener("click", () => {
   const collapsed = $(".seat-panel").classList.toggle("collapsed");
   document.body.classList.toggle("panel-collapsed", collapsed);
-  $("#panel-toggle").textContent = collapsed ? "+" : "−";
+  $("#panel-toggle").innerHTML = icon(collapsed ? "plus" : "minus");
   $("#panel-toggle").setAttribute("aria-expanded", String(!collapsed));
   $("#panel-toggle").setAttribute(
     "aria-label",
@@ -547,7 +548,7 @@ $("#settings-reset").addEventListener("click", () => {
 $("#source-links").innerHTML = PROVENANCE.sources
   .map(
     (s) =>
-      `<a href="${s.url}" target="_blank" rel="noopener noreferrer">${s.title} ↗</a>`,
+      `<a href="${s.url}" target="_blank" rel="noopener noreferrer">${s.title} ${icon("external-link")}</a>`,
   )
   .join("");
 function downloadBlob(blob, name) {

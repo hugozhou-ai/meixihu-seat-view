@@ -1,0 +1,22 @@
+{
+  "library": "lucide-static 1.61.0",
+  "checks": [
+    "SVG sprite renders",
+    "no uncompiled placeholders",
+    "aria-hidden and focusable on icons",
+    "panel plus/minus state",
+    "view-mode hint icon",
+    "lighting preserves SVG",
+    "source external-link icons",
+    "modal close icons",
+    "390px mobile layout",
+    "both theatres load"
+  ],
+  "audit": {
+    "icons": 29,
+    "uncompiled": 0,
+    "invalid": 0,
+    "emptyVisible": []
+  },
+  "errors": []
+}

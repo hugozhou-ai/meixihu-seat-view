@@ -110,3 +110,7 @@ npm run dev
 深圳资料由深圳保利剧院演出资讯公开发表，相关摄影及座位图权利归原作者与发布方。梅溪湖参考摄影 © Virgile Simon Bertrand / Zaha Hadid Architects；建筑设计 Zaha Hadid Architects。参考图片及图纸权利归原作者和发布方所有，本包保留来源供研究对照，未授予其独立商业再分发许可。生成几何为据此制作的近似重建，并非官方 BIM 或竣工模型。
 
 梅溪湖早期验收见 `验收报告.md`；深圳本次记录见 `深圳保利验收报告.md` 与 `acceptance/shenzhen-poly.json`。诊断接口统一为 `window.__THEATRE_VIEW__`，其中 `getState()` 返回当前 `theatreId`。
+
+## Agent 规则与图标
+
+开发规则见仓库根目录 `AGENTS.md`。所有界面图标统一使用锁定版本的 Lucide（`lucide-static`），名称集中在 `src/icons.js`。构建时按需生成本地 SVG sprite、favicon 和下拉箭头，保留 `dist/vendor/LUCIDE-LICENSE.txt`。静态图标使用 `data-icon` 占位符，动态状态调用 `icon()`；禁止通过 emoji、Unicode 符号或自绘 SVG 模拟界面图标。
