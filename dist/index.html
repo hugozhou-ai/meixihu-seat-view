@@ -64,7 +64,7 @@
           ></wa-select>
           <span class="eyebrow">FIND YOUR PERSPECTIVE</span>
           <div>
-            <h1>从这里，看见舞台。</h1>
+            <h1 id="perspective-title">从这里，看见舞台。</h1>
             <wa-button
               appearance="plain"
               size="s"
@@ -77,9 +77,22 @@
               <span class="sr-only button-label">收起选座面板</span></wa-button
             >
           </div>
-          <p>选一个座位，走进你的观演位置。</p>
+          <p id="perspective-description">选一个座位，走进你的观演位置。</p>
         </div>
         <div id="panel-body">
+          <wa-radio-group class="perspective-tabs" label="选择视角" orientation="horizontal" value="seat" size="s">
+            <wa-radio appearance="button" value="seat">观众视角</wa-radio>
+            <wa-radio appearance="button" value="stage">舞台视角</wa-radio>
+          </wa-radio-group>
+          <section id="stage-position-panel" aria-label="舞台位置选择" hidden>
+            <div class="stage-position-picker">
+              <h2>选择舞台站位</h2>
+              <p>站在舞台上看观众席，默认正对观众。左右以面向观众为准。</p>
+              <wa-radio-group id="stage-position" label="典型站位" value="front" size="s"></wa-radio-group>
+              <p>站姿眼高 1.65 m · 拖动画面可环顾</p>
+            </div>
+          </section>
+          <section id="audience-position-panel" aria-label="观众位置选择">
           <wa-radio-group
             class="floor-tabs"
             label="观众席楼层"
@@ -170,23 +183,24 @@
               </wa-button>
             </div>
           </div>
+          </section>
         </div>
       </aside>
       <wa-radio-group
         class="view-tabs"
         label="视图模式"
         orientation="horizontal"
-        value="seat"
+        value="perspective"
         size="s"
       >
-        <wa-radio appearance="button" id="mode-seat" value="seat"
-          ><svg class="icon" data-icon="armchair" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><use href="./icons.svg#armchair"></use></svg> 座位视角</wa-radio
+        <wa-radio appearance="button" id="mode-seat" value="perspective"
+          ><svg class="icon" data-icon="crosshair" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><use href="./icons.svg#crosshair"></use></svg> <span id="active-perspective-label">观众视角</span></wa-radio
         >
         <wa-radio appearance="button" id="mode-overview" value="overview"
           ><svg class="icon" data-icon="box" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><use href="./icons.svg#box"></use></svg> 剧场总览</wa-radio
         >
       </wa-radio-group>
-      <section class="seat-card" aria-label="当前座位信息" aria-live="polite">
+      <section class="seat-card" aria-label="当前位置视角信息" aria-live="polite">
         <span class="eyebrow" id="current-theatre-name">YOUR SEAT</span>
         <h2 id="selected-label">正在载入</h2>
         <div class="seat-metrics">
@@ -301,7 +315,7 @@
       >
       <wa-switch id="pit-toggle" size="s" checked>显示乐池活动座椅</wa-switch>
       <div class="dialog-note">
-        眼高相对于所在座位地坪。这里展示空场视角，不包含前排观众身体造成的遮挡。
+        坐姿眼高相对于所在座位地坪；舞台视角固定使用 1.65 m 站姿眼高，并隐藏比例人物。这里展示空场视角，不包含前排观众身体造成的遮挡。
       </div>
       <wa-button
         appearance="plain"

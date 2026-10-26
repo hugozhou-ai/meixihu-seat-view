@@ -4,6 +4,7 @@ import * as THREE from "three";
 import { OrbitControls } from "../vendor/OrbitControls.js";
 import { GLTFExporter } from "../vendor/GLTFExporter.js";
 import { seatEye, labelSeat, rowsFor } from "./layout.js";
+import { stageViewpoints, stageViewEye } from "./stage-view.js";
 import { VENUES, getVenue } from "./venues.js";
 const venue = getVenue(
   new URL(location.href).searchParams.get("theatre") || "meixihu",
@@ -15,6 +16,7 @@ const {
   version: MODEL_VERSION,
 } = venue;
 const DEFAULT_FOV = 75;
+const stagePoints = stageViewpoints(STAGE);
 const $ = (s) => document.querySelector(s);
 const seats = venue.makeLayout();
 const seatById = new Map(
@@ -22,6 +24,8 @@ const seatById = new Map(
 );
 const state = {
   mode: "seat",
+  stagePoint: stagePoints[0],
+  perspective: "seat",
   floor: "1F",
   selected: null,
   height: 1.16,
@@ -131,6 +135,7 @@ function goToSeat(seat, { animate = true, updateUrl = true } = {}) {
   state.selected = seat;
   state.floor = seat.level;
   state.mode = "seat";
+  state.perspective = "seat";
   controls.enabled = false;
   theatre.setOverview(false);
   const destination = cameraDestination(seat);
@@ -163,6 +168,7 @@ function goToSeat(seat, { animate = true, updateUrl = true } = {}) {
     const u = new URL(location.href);
     u.searchParams.set("theatre", venue.id);
     u.searchParams.set("seat", seat.seatId);
+    u.searchParams.delete("stage");
     history.replaceState(null, "", u);
   }
   log("seat-selected", {
@@ -172,6 +178,14 @@ function goToSeat(seat, { animate = true, updateUrl = true } = {}) {
   });
 }
 function updateInfo() {
+  if (state.mode === "stage") {
+    const point = state.stagePoint;
+    $("#selected-label").textContent = point.label;
+    $("#seat-distance").textContent = `${Math.abs(point.position[2] - STAGE.front).toFixed(1)} m`;
+    $("#seat-elevation").textContent = `${stageViewEye(point)[1].toFixed(2)} m`;
+    $("#seat-id").textContent = "舞台站位 · 站姿眼高 1.65 m · 默认正对观众";
+    return;
+  }
   const s = state.selected;
   $("#selected-label").textContent = labelSeat(s);
   $("#seat-distance").textContent =
@@ -181,15 +195,59 @@ function updateInfo() {
   $("#seat-id").textContent = s.seatId + " · 重建编号";
 }
 function updateMode() {
-  $(".view-tabs").value = state.mode;
+  const onStage = state.perspective === "stage";
+  $(".view-tabs").value = state.mode === "overview" ? "overview" : "perspective";
+  $(".perspective-tabs").value = state.perspective;
+  $("#stage-position-panel").hidden = !onStage;
+  $("#audience-position-panel").hidden = onStage;
+  $("#active-perspective-label").textContent = onStage ? "舞台视角" : "观众视角";
+  $("#perspective-title").textContent = onStage ? "从舞台，望向观众。" : "从这里，看见舞台。";
+  $("#perspective-description").textContent = onStage ? "选一个站位，感受舞台上的视野。" : "选一个座位，走进你的观演位置。";
+  theatre.actor.visible = state.mode !== "stage" && $("#actor-toggle").checked;
+  const resetLabel = state.mode === "stage" ? "恢复自然视角并面向观众" : "恢复自然视角并面向舞台";
+  $("#reset-view").setAttribute("aria-label", resetLabel);
+  $("#reset-view .button-label").textContent = resetLabel;
   $("#viewer-hint").innerHTML =
-    state.mode === "seat"
+    state.mode !== "overview"
       ? `${icon("move-horizontal")} 拖动转头 · 自然观演视角`
       : `${icon("move-horizontal")} 拖动旋转 · 滚轮缩放 · 点击座椅入座`;
 }
+function goToStage(point) {
+  transition = null;
+  state.stagePoint = point;
+  state.mode = "stage";
+  state.perspective = "stage";
+  controls.enabled = false;
+  theatre.setOverview(false);
+  camera.fov = state.fov;
+  camera.updateProjectionMatrix();
+  camera.position.set(...stageViewEye(point));
+  // Keep the heading perpendicular to the proscenium, including side positions.
+  camera.lookAt(point.position[0], camera.position.y, STAGE.front + 20);
+  setAnglesFromCamera();
+  $("#stage-position").value = point.id;
+  updateInfo();
+  updateMode();
+  const u = new URL(location.href);
+  u.searchParams.set("stage", point.id);
+  history.replaceState(null, "", u);
+  log("stage-selected", { point: point.id, eye: camera.position.toArray() });
+}
+$("#stage-position").innerHTML = stagePoints.map((point) =>
+  `<wa-radio appearance="button" value="${point.id}">${point.label}</wa-radio>`,
+).join("");
+$(".perspective-tabs").addEventListener("change", (event) => {
+  if (event.target.value === "stage") goToStage(state.stagePoint);
+  else goToSeat(state.selected);
+});
+$("#stage-position").addEventListener("change", (event) => {
+  const point = stagePoints.find((p) => p.id === event.target.value);
+  if (point) goToStage(point);
+});
 function setOverview() {
   transition = null;
   state.mode = "overview";
+  updateInfo();
   theatre.setOverview(true);
   controls.enabled = true;
   camera.fov = 47;
@@ -381,17 +439,22 @@ $("#random-seat").addEventListener("click", () => {
 });
 $(".view-tabs").addEventListener("change", (event) => {
   if (event.target.value === "overview") setOverview();
+  else if (state.perspective === "stage") goToStage(state.stagePoint);
   else goToSeat(state.selected);
 });
 function restoreNaturalView() {
   camera.zoom = 1;
   setFov(DEFAULT_FOV);
-  goToSeat(state.selected);
+  if (state.perspective === "stage") goToStage(state.stagePoint);
+  else goToSeat(state.selected);
   toast("已恢复自然视角");
 }
 $("#reset-view").addEventListener("click", restoreNaturalView);
 $("#look-back").addEventListener("click", () => {
-  if (state.mode === "overview") goToSeat(state.selected, { animate: false });
+  if (state.mode === "overview") {
+    if (state.perspective === "stage") goToStage(state.stagePoint);
+    else goToSeat(state.selected, { animate: false });
+  }
   transition = null;
   camera.lookAt(0, 11.5, 36);
   setAnglesFromCamera();
@@ -479,6 +542,7 @@ $("#venue-select").addEventListener("change", (e) => {
   const u = new URL(location.href);
   u.searchParams.set("theatre", e.target.value);
   u.searchParams.delete("seat");
+  u.searchParams.delete("stage");
   location.assign(u.href);
 });
 document.title = venue.name + " · 剧场座位视角";
@@ -507,18 +571,21 @@ $("#eye-height").addEventListener("input", (e) =>
 $("#fov").addEventListener("input", (e) => setFov(Number(e.target.value)));
 $("#actor-toggle").addEventListener(
   "change",
-  (e) => (theatre.actor.visible = e.target.checked),
+  (e) => (theatre.actor.visible = state.mode !== "stage" && e.target.checked),
 );
 function setPit(visible) {
   state.pit = visible;
   theatre.setPitVisible(visible);
-  if (!visible && state.selected.zone === "P")
+  if (!visible && state.selected.zone === "P") {
+    const onStage = state.perspective === "stage";
     goToSeat(
       seats.find(
         (s) =>
           s.level === "1F" && s.zone === "M" && s.row === 1 && s.number === 22,
       ),
     );
+    if (onStage) goToStage(state.stagePoint);
+  }
   updateFloorTabs();
   renderMaps();
   log("pit-configuration-changed", { visible });
@@ -529,7 +596,7 @@ $("#settings-reset").addEventListener("click", () => {
   camera.zoom = 1;
   setFov(DEFAULT_FOV);
   $("#actor-toggle").checked = true;
-  theatre.actor.visible = true;
+  theatre.actor.visible = state.mode !== "stage";
   $("#pit-toggle").checked = true;
   setPit(true);
   toast("已恢复默认视角参数");
@@ -638,14 +705,14 @@ renderer.domElement.addEventListener("pointerdown", (e) => {
     startY: e.clientY,
     moved: false,
   };
-  if (state.mode === "seat") {
+  if (state.mode !== "overview") {
     transition = null;
     setAnglesFromCamera();
     renderer.domElement.setPointerCapture(e.pointerId);
   }
 });
 renderer.domElement.addEventListener("pointermove", (e) => {
-  if (!drag || state.mode !== "seat") return;
+  if (!drag || state.mode === "overview") return;
   const dx = e.clientX - drag.x,
     dy = e.clientY - drag.y;
   if (Math.hypot(e.clientX - drag.startX, e.clientY - drag.startY) > 4)
@@ -690,7 +757,7 @@ renderer.domElement.addEventListener("pointercancel", () => (drag = null));
 renderer.domElement.addEventListener(
   "wheel",
   (e) => {
-    if (state.mode === "seat") {
+    if (state.mode !== "overview") {
       e.preventDefault();
     }
   },
@@ -698,7 +765,7 @@ renderer.domElement.addEventListener(
 );
 renderer.domElement.addEventListener("keydown", (e) => {
   if (
-    state.mode !== "seat" ||
+    state.mode === "overview" ||
     !["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "Home"].includes(e.key)
   )
     return;
@@ -758,7 +825,9 @@ const initial =
   queryId && seatById.has(queryId)
     ? seatById.get(queryId).seat
     : seatById.get(venue.defaultSeat).seat;
+const initialStage = stagePoints.find((p) => p.id === new URL(location.href).searchParams.get("stage"));
 goToSeat(initial, { animate: false });
+if (initialStage) goToStage(initialStage);
 setFov(state.fov);
 requestAnimationFrame(frame);
 $("#loading").remove();
@@ -782,7 +851,8 @@ window.__THEATRE_VIEW__ = {
       floor: state.floor,
       selected: state.selected.seatId,
       eye: camera.position.toArray(),
-      expectedEye: seatEye(state.selected, state.height),
+      stagePoint: state.stagePoint.id,
+      expectedEye: state.mode === "stage" ? stageViewEye(state.stagePoint) : seatEye(state.selected, state.height),
       quaternion: camera.quaternion.toArray(),
       fov: camera.fov,
       zoom: camera.zoom,
@@ -812,6 +882,12 @@ window.__THEATRE_VIEW__ = {
     goToSeat(e.seat, { animate });
     camera.fov = state.fov;
     camera.updateProjectionMatrix();
+  },
+  listStagePoints: () => stagePoints,
+  selectStage(id) {
+    const point = stagePoints.find((p) => p.id === id);
+    if (!point) throw new Error("Unknown stage point " + id);
+    goToStage(point);
   },
   overview: setOverview,
   inspectAllSeatCameras() {

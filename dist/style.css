@@ -1165,3 +1165,60 @@ wa-tooltip {
 .viewer-tools wa-button::part(button) {
   color: #eee9df;
 }
+
+/* Choose the perspective first, then show only its position controls. */
+#stage-position-panel[hidden],
+#audience-position-panel[hidden] {
+  display: none;
+}
+.perspective-tabs {
+  margin-bottom: 18px;
+}
+.perspective-tabs::part(form-control-input) {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4px;
+  padding: 4px;
+  border-radius: 10px;
+  background: #e4e5da;
+}
+.perspective-tabs wa-radio {
+  margin: 0;
+  border-radius: 7px;
+  color: #727e6c;
+  padding: 10px 8px;
+  text-align: center;
+}
+.perspective-tabs wa-radio:state(checked) {
+  background: #fafaf5;
+  color: #344839;
+}
+.stage-position-picker h2 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 500;
+}
+.stage-position-picker p {
+  font-size: 11px;
+  line-height: 1.7;
+  color: var(--muted);
+  margin: 8px 0 16px;
+}
+#stage-position::part(form-control-input) {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+#stage-position wa-radio {
+  margin: 0;
+  padding: 12px 8px;
+  border: 1px solid #c5ccbc;
+  border-radius: 8px;
+  color: #53644f;
+  text-align: center;
+}
+#stage-position wa-radio:state(checked) {
+  background: #344839;
+  border-color: #344839;
+  color: #fafaf5;
+}
