@@ -1,0 +1,105 @@
+{
+  "venue": "shenzhen-poly",
+  "checks": [
+    {
+      "name": "poly initial natural eye",
+      "pass": true
+    },
+    {
+      "name": "1F count",
+      "count": 951,
+      "pass": true
+    },
+    {
+      "name": "2F count",
+      "count": 396,
+      "pass": true
+    },
+    {
+      "name": "3F count",
+      "count": 204,
+      "pass": true
+    },
+    {
+      "name": "third-floor box form selection",
+      "pass": true
+    },
+    {
+      "name": "enlarged-map selection",
+      "pass": true
+    },
+    {
+      "name": "four Shenzhen reference tabs",
+      "pass": true
+    },
+    {
+      "name": "98-seat orchestra visibility",
+      "pass": true
+    },
+    {
+      "name": "all Shenzhen camera eyes",
+      "checked": 1551,
+      "uniqueEyes": 1551,
+      "failures": [],
+      "pass": true
+    },
+    {
+      "name": "3D chair picking",
+      "pass": true
+    },
+    {
+      "name": "Meixihu switch regression and all floor supports",
+      "checked": 1811,
+      "pass": true
+    },
+    {
+      "name": "switch back resets to Shenzhen default and URL carries theatre",
+      "pass": true
+    },
+    {
+      "name": "mobile 390px no overflow and collapsed panel does not cover seat card",
+      "pass": true
+    }
+  ],
+  "final": {
+    "theatreId": "shenzhen-poly",
+    "theatreName": "深圳保利剧院",
+    "ready": true,
+    "mode": "seat",
+    "floor": "1F",
+    "selected": "1F-M-12-22",
+    "eye": [
+      0,
+      2.24,
+      16.86
+    ],
+    "expectedEye": [
+      0,
+      2.24,
+      16.86
+    ],
+    "quaternion": [
+      -0.023767578955034452,
+      0,
+      0,
+      0.9997175111953458
+    ],
+    "fov": 75,
+    "zoom": 1,
+    "height": 1.16,
+    "pit": true,
+    "errors": [],
+    "transitioning": false,
+    "render": {
+      "fps": 1,
+      "lastRenderMs": 0.2999999523162842,
+      "calls": 28,
+      "triangles": 430468
+    },
+    "dimensions": {
+      "width": 1674,
+      "height": 939
+    },
+    "modelVersion": "0.1.0"
+  }
+}

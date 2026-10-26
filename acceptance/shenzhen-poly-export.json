@@ -1,0 +1,15 @@
+{
+  "venue": "shenzhen-poly",
+  "modelVersion": "0.1.0",
+  "bytes": 4733720,
+  "uniqueSeatIds": 1551,
+  "nodes": 9333,
+  "importedMeshes": 9328,
+  "checks": {
+    "glbHeader": true,
+    "bufferBounds": true,
+    "all1551SeatIds": true,
+    "threeGLTFLoaderReimport": true
+  },
+  "failures": []
+}

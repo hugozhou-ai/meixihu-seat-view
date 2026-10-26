@@ -7,3 +7,5 @@
 这些资产可在公开仓库中下载，不随 GitHub Pages 的 `dist/` 自动发布。网页仍可在本地浏览器中自行导出 GLB 与 JSON。
 
 模型尺寸和票面编号尚待核实；详细精度说明见项目 README。参考摄影与建筑图纸的权利说明同 README。
+
+深圳保利新增资产：`models/shenzhen-poly-theatre-interior.glb`、`models/shenzhen-poly-theatre-seats.json`，以及 `screenshots/shenzhen-poly-*.png`。模型含 1,551 个按历史座位图逐排重建的位置；三维尺度与编号仍待核实，精度说明见主 README 的深圳章节。

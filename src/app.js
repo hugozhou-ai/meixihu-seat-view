@@ -1,20 +1,20 @@
 import * as THREE from "three";
 import { OrbitControls } from "../vendor/OrbitControls.js";
 import { GLTFExporter } from "../vendor/GLTFExporter.js";
-import {
-  makeLayout,
-  seatEye,
-  labelSeat,
-  LEVELS,
-  PROVENANCE,
-  STAGE,
-  rowsFor,
-  MODEL_VERSION,
-} from "./layout.js";
-import { buildTheatre } from "./theatre.js";
+import { seatEye, labelSeat, rowsFor } from "./layout.js";
+import { VENUES, getVenue } from "./venues.js";
+const venue = getVenue(
+  new URL(location.href).searchParams.get("theatre") || "meixihu",
+);
+const {
+  stage: STAGE,
+  levels: LEVELS,
+  provenance: PROVENANCE,
+  version: MODEL_VERSION,
+} = venue;
 const DEFAULT_FOV = 75;
 const $ = (s) => document.querySelector(s);
-const seats = makeLayout();
+const seats = venue.makeLayout();
 const seatById = new Map(
   seats.map((s, i) => [s.seatId, { seat: s, index: i }]),
 );
@@ -33,13 +33,13 @@ const state = {
   errors: [],
 };
 function log(event, data = {}) {
-  console.info("[MEIXIHU_VIEW]", JSON.stringify({ event, ...data }));
+  console.info("[THEATRE_VIEW]", JSON.stringify({ event, ...data }));
 }
 function reportError(event, error) {
   const message = error?.message || String(error);
   state.errors.push({ event, message });
   console.error(
-    "[MEIXIHU_VIEW]",
+    "[THEATRE_VIEW]",
     JSON.stringify({ event, message, stack: error?.stack }),
   );
 }
@@ -69,7 +69,7 @@ renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.12;
 viewport.appendChild(renderer.domElement);
-renderer.domElement.setAttribute("aria-label", "梅溪湖大剧院内部三维画面");
+renderer.domElement.setAttribute("aria-label", venue.name + "内部三维画面");
 renderer.domElement.tabIndex = 0;
 const scene = new THREE.Scene();
 scene.background = new THREE.Color("#171b16");
@@ -80,7 +80,7 @@ const camera = new THREE.PerspectiveCamera(
   180,
 );
 camera.name = "Seated_Eye_Camera";
-const theatre = buildTheatre(seats);
+const theatre = venue.build(seats);
 scene.add(theatre.root);
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enabled = false;
@@ -159,6 +159,7 @@ function goToSeat(seat, { animate = true, updateUrl = true } = {}) {
   renderMaps();
   if (updateUrl) {
     const u = new URL(location.href);
+    u.searchParams.set("theatre", venue.id);
     u.searchParams.set("seat", seat.seatId);
     history.replaceState(null, "", u);
   }
@@ -240,6 +241,8 @@ function fillFormFromSeat() {
         L: "左侧楼座",
         R: "右侧楼座",
         P: "乐池",
+        BL: "左侧包厢",
+        BR: "右侧包厢",
       }[z],
     ]),
     s.zone,
@@ -251,7 +254,7 @@ function fillRows(row, number) {
   const rows = rowsFor(seats, state.floor, zone);
   options(
     $("#row-select"),
-    rows.map((r) => [r, `${r}排`]),
+    rows.map((r) => [r, zone.startsWith("B") ? `${r}号包厢` : `${r}排`]),
     rows.includes(Number(row)) ? row : rows[0],
   );
   fillNumbers(number);
@@ -337,9 +340,9 @@ for (const tab of document.querySelectorAll("[data-floor]"))
     const arr = seats.filter((s) => s.level === level && s.zone === "M");
     const middle = arr.reduce(
       (best, s) =>
-        Math.abs(s.position[0]) + Math.abs(s.row - (level === "1F" ? 12 : 8)) <
+        Math.abs(s.position[0]) + Math.abs(s.row - venue.middleRows[level]) <
         Math.abs(best.position[0]) +
-          Math.abs(best.row - (level === "1F" ? 12 : 8))
+          Math.abs(best.row - venue.middleRows[level])
           ? s
           : best,
       arr[0],
@@ -454,23 +457,43 @@ for (const d of document.querySelectorAll("dialog"))
         d.close();
     }
   });
+$("#reference-title").textContent = "对照真实的" + venue.name;
+$(".reference-tabs").innerHTML = venue.references
+  .map(
+    (r, i) =>
+      `<button data-reference="${r.file}" class="${i === 0 ? "active" : ""}">${r.label}</button>`,
+  )
+  .join("");
+function showReference(file) {
+  const ref = venue.references.find((r) => r.file === file);
+  $("#reference-image").src = new URL(
+    "../reference/" + ref.file,
+    import.meta.url,
+  ).href;
+  $("#reference-image").alt = venue.name + " · " + ref.label;
+  $("#reference-caption").textContent = ref.caption;
+  for (const b of document.querySelectorAll("[data-reference]"))
+    b.classList.toggle("active", b.dataset.reference === file);
+}
 for (const b of document.querySelectorAll("[data-reference]"))
-  b.addEventListener("click", () => {
-    for (const a of document.querySelectorAll("[data-reference]"))
-      a.classList.toggle("active", a === b);
-    $("#reference-image").src = new URL(
-      "../reference/" + b.dataset.reference,
-      import.meta.url,
-    ).href;
-    $("#reference-image").alt = b.textContent + "：梅溪湖大剧院公开参考资料";
-    $("#reference-caption").textContent = b.dataset.reference.startsWith(
-      "auditorium",
-    )
-      ? "实景摄影 © Virgile Simon Bertrand / ZHA · 公开发表资料，不代表模型已实测校准。"
-      : b.dataset.reference.startsWith("seating")
-        ? "湖南湘江集团发布 · 2017年历史座位排列，图像较低清，不能可靠读取全部票面座号。"
-        : "图纸 © Zaha Hadid Architects / ArchDaily · 建筑楼层与票务楼层需结合剖面核对。";
-  });
+  b.addEventListener("click", () => showReference(b.dataset.reference));
+showReference(venue.references[0].file);
+$("#model-form-note").textContent = venue.formNote;
+$("#model-seat-note").textContent = venue.seatNote;
+$("#model-size-note").textContent = venue.sizeNote;
+$("#venue-name").textContent = venue.name + " · 主剧场";
+$("#current-theatre-name").textContent = venue.name + " · YOUR SEAT";
+$("#venue-select").innerHTML = VENUES.map(
+  (v) => `<option value="${v.id}">${v.name}</option>`,
+).join("");
+$("#venue-select").value = venue.id;
+$("#venue-select").addEventListener("change", (e) => {
+  const u = new URL(location.href);
+  u.searchParams.set("theatre", e.target.value);
+  u.searchParams.delete("seat");
+  location.assign(u.href);
+});
+document.title = venue.name + " · 剧场座位视角";
 function setEyeHeight(value) {
   state.height = value;
   $("#eye-height").value = String(Math.round(value * 100));
@@ -498,39 +521,7 @@ $("#actor-toggle").addEventListener(
 );
 function setPit(visible) {
   state.pit = visible;
-  for (const mesh of theatre.chairs) {
-    const d = new THREE.Object3D();
-    seats.forEach((s, i) => {
-      if (s.zone !== "P") return;
-      if (!visible) {
-        d.position.set(...s.position);
-        d.scale.set(0, 0, 0);
-        d.updateMatrix();
-        mesh.setMatrixAt(i, d.matrix);
-      } else {
-        const part = Number(mesh.name.split("_").at(-1));
-        const defs = [
-          [[0, 0.46, -0.025], 0],
-          [[0, 0.72, 0.18], -0.1],
-          [[-0.265, 0.35, 0.02], 0],
-          [[0.265, 0.35, 0.02], 0],
-          [[-0.265, 0.57, -0.015], 0],
-          [[0.265, 0.57, -0.015], 0],
-        ];
-        const local = new THREE.Object3D();
-        local.position.set(...defs[part][0]);
-        local.rotation.x = defs[part][1];
-        local.updateMatrix();
-        d.position.set(...s.position);
-        d.rotation.set(0, s.yaw, 0);
-        d.scale.set(1, 1, 1);
-        d.updateMatrix();
-        mesh.setMatrixAt(i, d.matrix.clone().multiply(local.matrix));
-      }
-    });
-    mesh.instanceMatrix.needsUpdate = true;
-    mesh.computeBoundingSphere();
-  }
+  theatre.setPitVisible(visible);
   if (!visible && state.selected.zone === "P")
     goToSeat(
       seats.find(
@@ -575,6 +566,8 @@ $("#export-seat-data").addEventListener("click", () =>
       [
         JSON.stringify(
           {
+            theatreId: venue.id,
+            theatreName: venue.name,
             version: MODEL_VERSION,
             units: "metres",
             axis: "Y-up",
@@ -588,7 +581,7 @@ $("#export-seat-data").addEventListener("click", () =>
       ],
       { type: "application/json" },
     ),
-    "meixihu-seats.json",
+    venue.slug + "-seats.json",
   ),
 );
 $("#export-model").addEventListener("click", async () => {
@@ -597,8 +590,9 @@ $("#export-model").addEventListener("click", async () => {
   $("#export-status").textContent = "正在打包三维模型，请稍候…";
   try {
     const g = new THREE.Group();
-    g.name = "Meixihu_Interior_Reconstruction";
+    g.name = venue.slug + "_Interior_Reconstruction";
     g.userData = {
+      theatreId: venue.id,
       provenance: PROVENANCE,
       modelVersion: MODEL_VERSION,
       units: "metres",
@@ -629,7 +623,7 @@ $("#export-model").addEventListener("click", async () => {
     });
     downloadBlob(
       new Blob([data], { type: "model/gltf-binary" }),
-      "meixihu-grand-theatre-interior.glb",
+      venue.slug + "-interior.glb",
     );
     $("#export-status").textContent =
       "已导出 GLB。文件包含重建几何与座位标识，尺寸仍待校准。";
@@ -764,17 +758,14 @@ function frame(now) {
     state.frames = 0;
     renderLast = now;
     $("#render-status").textContent =
-      `三层主剧场 · ${seats.length.toLocaleString()} 个重建位置`;
+      `${venue.name} · ${seats.length.toLocaleString()} 个重建位置`;
   }
 }
 const queryId = new URL(location.href).searchParams.get("seat");
 const initial =
   queryId && seatById.has(queryId)
     ? seatById.get(queryId).seat
-    : seats.find(
-        (s) =>
-          s.level === "1F" && s.zone === "M" && s.row === 12 && s.number === 26,
-      );
+    : seatById.get(venue.defaultSeat).seat;
 goToSeat(initial, { animate: false });
 setFov(state.fov);
 requestAnimationFrame(frame);
@@ -789,9 +780,11 @@ log("scene-ready", {
   version: MODEL_VERSION,
 });
 // Bounded diagnostics expose actual runtime state for acceptance and future calibration.
-window.__MEIXIHU__ = {
+window.__THEATRE_VIEW__ = {
   getState() {
     return {
+      theatreId: venue.id,
+      theatreName: venue.name,
       ready: state.ready,
       mode: state.mode,
       floor: state.floor,

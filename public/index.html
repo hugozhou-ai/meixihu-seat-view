@@ -7,7 +7,7 @@
     <title>剧场座位视角 · Theatre Seat View</title>
     <meta
       name="description"
-      content="探索剧场三维空间，选择座位，查看坐姿观演视角。当前收录梅溪湖大剧院主剧场，依据公开图纸与照片重建。"
+      content="探索剧场三维空间，选择座位，查看坐姿观演视角。收录梅溪湖大剧院与深圳保利剧院主剧场，依据公开图纸与照片重建。"
     />
     <link
       rel="icon"
@@ -35,7 +35,8 @@
           ><span>剧场座位视角<small>THEATRE · SEAT VIEW</small></span></a
         >
         <div class="header-center">
-          <span class="live-dot"></span> 梅溪湖大剧院 · 主剧场
+          <span class="live-dot"></span>
+          <span id="venue-name">主剧场 · 三维观演</span>
         </div>
         <div class="header-actions">
           <button id="reference-open" class="button subtle">
@@ -51,6 +52,9 @@
       </header>
       <aside class="seat-panel" aria-label="座位选择">
         <div class="panel-title">
+          <label class="venue-picker"
+            >选择剧场<select id="venue-select" aria-label="选择剧场"></select
+          ></label>
           <span class="eyebrow">FIND YOUR PERSPECTIVE</span>
           <div>
             <h1>从这里，看见舞台。</h1>
@@ -143,7 +147,7 @@
         ><button id="mode-overview" aria-pressed="false">◇ 剧场总览</button>
       </nav>
       <section class="seat-card" aria-label="当前座位信息" aria-live="polite">
-        <span class="eyebrow">YOUR SEAT</span>
+        <span class="eyebrow" id="current-theatre-name">YOUR SEAT</span>
         <h2 id="selected-label">正在载入</h2>
         <div class="seat-metrics">
           <span>距台口 <strong id="seat-distance">—</strong></span
@@ -152,7 +156,11 @@
         <span id="seat-id" class="seat-id"></span>
       </section>
       <div class="viewer-tools">
-        <button id="reset-view" class="tool-button" aria-label="恢复自然视角并面向舞台">
+        <button
+          id="reset-view"
+          class="tool-button"
+          aria-label="恢复自然视角并面向舞台"
+        >
           ⌖<span>自然视角</span></button
         ><button id="look-back" class="tool-button" aria-label="回望观众厅">
           ↶<span>回望观众厅</span></button
@@ -219,29 +227,19 @@
       <div class="dialog-heading">
         <div>
           <span class="eyebrow">VISUAL REFERENCES</span>
-          <h2>对照真实的梅溪湖</h2>
+          <h2 id="reference-title">实景与资料对照</h2>
         </div>
         <button data-close class="icon-button" aria-label="关闭实景对照">
           ×
         </button>
       </div>
-      <div class="reference-tabs">
-        <button data-reference="auditorium-front.jpg" class="active">
-          舞台望向观众席</button
-        ><button data-reference="auditorium-back.jpg">观众厅与顶棚</button
-        ><button data-reference="section-long.jpg">纵剖面</button
-        ><button data-reference="plan-2f.jpg">建筑平面</button
-        ><button data-reference="seating-all.jpg">全厅座位图</button>
-      </div>
+      <div class="reference-tabs"></div>
       <img
         id="reference-image"
         src="./reference/auditorium-front.jpg"
         alt="梅溪湖大剧院观众厅实景，摄影Virgile Simon Bertrand"
       />
-      <p id="reference-caption">
-        实景摄影 © Virgile Simon Bertrand / ZHA ·
-        公开发表资料，不代表模型已实测校准。
-      </p>
+      <p id="reference-caption"></p>
     </dialog>
     <dialog id="info-dialog" class="info-dialog">
       <div class="dialog-heading">
@@ -258,17 +256,11 @@
       </div>
       <dl>
         <dt>形态依据</dt>
-        <dd>
-          ZHA公开平面与剖面、观众厅摄影；重建木色墙顶面、曲线灯带、池座和两层楼座。
-        </dd>
+        <dd id="model-form-note">正在读取当前剧场资料。</dd>
         <dt>座位依据</dt>
-        <dd>
-          主座区的1681个位置由公开座位图逐排描点；另有130个按容量重建的乐池活动位置。共1811个位置均可选择。排号和座号为重建编号，不等同于已核对的票面编号。
-        </dd>
+        <dd id="model-seat-note">正在读取当前剧场资料。</dd>
         <dt>尺寸依据</dt>
-        <dd>
-          以台口、剖面层级和照片比例建立可调整几何。排距、逐排高程、栏板高度等仍需实测或竣工图校准。
-        </dd>
+        <dd id="model-size-note">正在读取当前剧场资料。</dd>
         <dt>视角范围</dt>
         <dd>
           相机固定在所选座位的坐姿眼点，可左右转头、抬头、低头；显示模型几何的遮挡，默认不含观众。

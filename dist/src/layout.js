@@ -67,6 +67,7 @@ export function makeLayout() {
   ) {
     const seatId = `${level}-${zone}-${String(row).padStart(2, "0")}-${String(index).padStart(2, "0")}`;
     seats.push({
+      theatreId: "meixihu",
       seatId,
       level,
       zone,
@@ -160,6 +161,8 @@ export function seatEye(seat, height = 1.16) {
   ];
 }
 export function labelSeat(seat) {
+  if (seat.zone.startsWith("B"))
+    return `${LEVELS.find((l) => l.id === seat.level).short} ${seat.row}号包厢 · ${seat.number}座`;
   const zone =
     seat.level === "1F" && seat.zone === "M"
       ? "池座"

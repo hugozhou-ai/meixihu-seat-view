@@ -1,6 +1,6 @@
 # Theatre Seat View · 剧场座位视角
 
-面向不同剧场的三维重建与逐座观演视角项目。版本 0.2.0，目前已收录梅溪湖大剧院主剧场，后续将在同一项目中扩展其他剧场。
+面向不同剧场的三维重建与逐座观演视角项目。版本 0.3.0，已收录梅溪湖大剧院和深圳保利剧院的主剧场。
 
 以公开平剖面、观众厅照片和座位图制作可编辑三维模型。前端使用 Three.js，所有运行依赖随包提供，无需 CDN、API Key 或后端。
 
@@ -8,6 +8,15 @@
 GitHub Pages：[在线体验](https://hugozhou-ai.github.io/theatre-seat-view/)。部署状态见 [GitHub Actions](https://github.com/hugozhou-ai/theatre-seat-view/actions/workflows/pages.yml)。
 
 本地开发目录：`/Users/vector/Documents/CODES/WORK_SPACE_B/theatre-seat-view`。
+
+## 已收录剧场
+
+| 剧场 | 位置数 | 直接打开 |
+| --- | ---: | --- |
+| 梅溪湖大剧院主剧场 | 1,811 | [进入模型](https://hugozhou-ai.github.io/theatre-seat-view/?theatre=meixihu) |
+| 深圳保利剧院主剧场 | 1,551 | [进入模型](https://hugozhou-ai.github.io/theatre-seat-view/?theatre=shenzhen-poly) |
+
+左侧“选择剧场”可切换模型，并同时更新座位图、资料对照、来源说明和导出文件。切馆会重新加载页面与相应模型，避免上一剧场的相机和坐标状态混用。
 
 ## 使用
 
@@ -30,6 +39,7 @@ npm run dev
 
 `.openai/hosting.json` 保留原 Sites 站点标识，GitHub Actions 不使用它。原 Sites 页面与 GitHub Pages 分别部署，推送 GitHub 不会自动更新原 Sites 页面。
 
+- 深圳包厢可在区域中选择左侧/右侧包厢，再选择包厢号与座位。
 - 点击座位图，或选择楼层、区域、排、座后入座。总览模式下也可点击可见三维座椅。
 - 座位视角默认采用 75° 垂直视场角及 1 倍镜头倍率，拖动转头；相机始终固定在该座位的坐姿眼点。滚轮不改变座位视野，总览模式仍可滚轮缩放。
 - 点击“自然视角”或在三维画面中按 Home，可恢复默认视野并面向舞台。
@@ -40,7 +50,23 @@ npm run dev
 
 ## 数据与精度
 
-以下数据和公开参考对应当前收录的梅溪湖大剧院主剧场；模型、照片与导出文件保留剧场名称，便于后续与其他剧场区分。
+### 深圳保利剧院
+
+| 区域 | 位置数 | 来源 |
+| --- | ---: | --- |
+| 一层固定池座 | 853 | 21 排，来源图逐排标注 |
+| 乐池活动位置 | 98 | 4 排：22、23、26、27 |
+| 二层楼座与包厢 | 396 | 普通楼座 360、包厢 36 |
+| 三层楼座与包厢 | 204 | 普通楼座 184、包厢 20 |
+| 合计 | 1,551 | 含 56 个包厢位置 |
+
+依据深圳保利剧院演出资讯 2020 年发布的三张分层座位图逐排重建数量，按图示分块和弧线排列位置。**这不是自动识别得到的逐座实测坐标。** 中间与侧区的座椅中心沿重建曲线插值，包厢位置与全部三维尺寸仍为估算。`topology=published-2020-row-counts`；`mapPosition` 为图示排布的重建坐标，不能作为原图逐座描点记录。
+
+内景独立重建为红色座椅、金色楼座前缘、灰色声学墙面、侧包厢和分块木质顶棚。台口采用 16 m × 10 m 的建模参数，当前未取得足以校准的竣工平剖面或现场高程；台口、排距、楼座标高、栏板和舞台深度均待核实。仅建模观众可见的舞台，不包含完整后台系统。
+
+### 梅溪湖大剧院
+
+以下为梅溪湖模型数据；各剧场的资料、图片和导出文件分别命名。
 
 | 区域 | 位置数 | 依据 |
 | --- | ---: | --- |
@@ -60,10 +86,14 @@ npm run dev
 
 ## 编辑入口
 
-- `src/layout.js`：尺度、楼层高差、楼座映射、座位位置、眼点。
+- `src/venues.js`：剧场注册、独立模型构建入口、参考资料、默认座位与精度说明。
+- `src/poly-layout.js`：深圳逐排数量、包厢分区和估算坐标。
+- `src/poly-theatre.js`：深圳独立室内建筑与材质。
+- `src/theatre-common.js`：共用座椅实例化、原始矩阵显隐恢复和静态几何合并。
+- `src/layout.js`：梅溪湖尺度、楼层高差、楼座映射、座位位置、眼点。
 - `src/traced-seating.js`：从原座位图描出的每排座位块。
 - `scripts/trace-reference.py`：生成原图描点数据，运行需 Python 和 Pillow。
-- `src/theatre.js`：木饰面、顶棚、栏板、楼层支撑和座椅几何。
+- `src/theatre.js`：梅溪湖木饰面、顶棚、栏板、楼层支撑和座椅几何。
 - `src/app.js`：选座、相机、触屏、导出与诊断。
 - `tests/layout.test.mjs`：数据、眼点、座椅间距和原图拓扑检查。
 
@@ -71,10 +101,12 @@ npm run dev
 
 ## 公开参考与署名
 
+- [深圳保利剧院演出资讯：2020 年分层座位图与内景](https://www.sohu.com/a/396239249_703600)
+- [保利剧院公司：深圳剧院名录](https://www.polytheatre.com/newsCer/514)
 - [ZHA / ArchDaily 项目资料、平剖面与内景](https://www.archdaily.com/929645/changsha-meixihu-international-culture-and-art-centre-zaha-hadid-design)
 - [湖南湘江集团 2017 年全厅座位排列](https://www.sohu.com/a/152800195_760112)
 - [湘江新区 2018 年一层座位资料](https://www.sohu.com/a/231444430_395453)
 
-参考摄影 © Virgile Simon Bertrand / Zaha Hadid Architects；建筑设计 Zaha Hadid Architects。参考图片及图纸权利归原作者和发布方所有，本包保留来源供研究对照，未授予其独立商业再分发许可。生成几何为据此制作的近似重建，并非官方 BIM 或竣工模型。
+深圳资料由深圳保利剧院演出资讯公开发表，相关摄影及座位图权利归原作者与发布方。梅溪湖参考摄影 © Virgile Simon Bertrand / Zaha Hadid Architects；建筑设计 Zaha Hadid Architects。参考图片及图纸权利归原作者和发布方所有，本包保留来源供研究对照，未授予其独立商业再分发许可。生成几何为据此制作的近似重建，并非官方 BIM 或竣工模型。
 
-验收记录见 `验收报告.md` 与 `acceptance/`。
+梅溪湖早期验收见 `验收报告.md`；深圳本次记录见 `深圳保利验收报告.md` 与 `acceptance/shenzhen-poly.json`。诊断接口统一为 `window.__THEATRE_VIEW__`，其中 `getState()` 返回当前 `theatreId`。
