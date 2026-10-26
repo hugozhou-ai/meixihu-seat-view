@@ -1,3 +1,4 @@
+import { build } from "esbuild";
 import { ICON_NAMES, icon } from "../src/icons.js";
 import { rm, mkdir, cp, readFile, writeFile } from "node:fs/promises";
 await rm("dist", { recursive: true, force: true });
@@ -53,16 +54,29 @@ await writeFile(
   "dist/favicon.svg",
   favicon.replace('stroke="currentColor"', 'stroke="#d5c29d"'),
 );
-const chevron = await readFile(
-  "node_modules/lucide-static/icons/chevron-down.svg",
-  "utf8",
-);
-await writeFile(
-  "dist/select-chevron.svg",
-  chevron.replace('stroke="currentColor"', 'stroke="#6d7c62"'),
-);
 await cp(
   "node_modules/lucide-static/LICENSE",
   "dist/vendor/LUCIDE-LICENSE.txt",
+);
+await build({
+  entryPoints: ["src/components.js"],
+  outfile: "dist/src/components.js",
+  bundle: true,
+  format: "esm",
+  target: "es2022",
+  minify: true,
+  legalComments: "linked",
+});
+await build({
+  entryPoints: [
+    "node_modules/@awesome.me/webawesome/dist/styles/themes/default.css",
+  ],
+  outfile: "dist/vendor/webawesome.css",
+  bundle: true,
+  minify: true,
+});
+await cp(
+  "node_modules/@awesome.me/webawesome/LICENSE.md",
+  "dist/vendor/WEB-AWESOME-LICENSE.txt",
 );
 console.log(JSON.stringify({ build: "complete", output: "dist" }));

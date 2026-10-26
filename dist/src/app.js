@@ -1,4 +1,5 @@
-import { icon } from "./icons.js";
+import "./components.js";
+import { icon, iconButtonContent } from "./icons.js";
 import * as THREE from "three";
 import { OrbitControls } from "../vendor/OrbitControls.js";
 import { GLTFExporter } from "../vendor/GLTFExporter.js";
@@ -180,13 +181,7 @@ function updateInfo() {
   $("#seat-id").textContent = s.seatId + " · 重建编号";
 }
 function updateMode() {
-  for (const mode of ["seat", "overview"]) {
-    $("#mode-" + mode).classList.toggle("active", state.mode === mode);
-    $("#mode-" + mode).setAttribute(
-      "aria-pressed",
-      String(state.mode === mode),
-    );
-  }
+  $(".view-tabs").value = state.mode;
   $("#viewer-hint").innerHTML =
     state.mode === "seat"
       ? `${icon("move-horizontal")} 拖动转头 · 自然观演视角`
@@ -206,19 +201,19 @@ function setOverview() {
   log("overview-opened");
 }
 function updateFloorTabs() {
-  for (const b of document.querySelectorAll("[data-floor]"))
-    b.setAttribute("aria-selected", String(b.dataset.floor === state.floor));
+  $(".floor-tabs").value = state.floor;
   const n = seats.filter(
     (s) => s.level === state.floor && (state.pit || s.zone !== "P"),
   ).length;
   $("#floor-count").textContent =
     `${LEVELS.find((l) => l.id === state.floor).label} · ${n} 个位置`;
 }
+// Pass cascade values from layout data: component option caches update on slotchange.
 function options(el, list, current) {
   el.innerHTML = "";
   for (const [value, label] of list) {
-    const o = document.createElement("option");
-    o.value = value;
+    const o = document.createElement("wa-option");
+    o.value = String(value);
     o.textContent = label;
     el.append(o);
   }
@@ -248,24 +243,25 @@ function fillFormFromSeat() {
     ]),
     s.zone,
   );
-  fillRows(s.row, s.number);
+  fillRows(s.row, s.number, s.zone);
 }
-function fillRows(row, number) {
-  const zone = $("#zone-select").value;
+function fillRows(row, number, zone = $("#zone-select").value) {
   const rows = rowsFor(seats, state.floor, zone);
+  const selectedRow = rows.includes(Number(row)) ? row : rows[0];
   options(
     $("#row-select"),
     rows.map((r) => [r, zone.startsWith("B") ? `${r}号包厢` : `${r}排`]),
-    rows.includes(Number(row)) ? row : rows[0],
+    selectedRow,
   );
-  fillNumbers(number);
+  fillNumbers(number, zone, selectedRow);
 }
-function fillNumbers(number) {
+function fillNumbers(
+  number,
+  zone = $("#zone-select").value,
+  row = $("#row-select").value,
+) {
   const arr = seats.filter(
-    (s) =>
-      s.level === state.floor &&
-      s.zone === $("#zone-select").value &&
-      s.row === Number($("#row-select").value),
+    (s) => s.level === state.floor && s.zone === zone && s.row === Number(row),
   );
   options(
     $("#number-select"),
@@ -310,7 +306,7 @@ function onMapClick(e) {
   if (!circle) return;
   const entry = seatById.get(circle.dataset.seat);
   if (entry) {
-    if ($("#map-dialog").open) $("#map-dialog").close();
+    if ($("#map-dialog").open) $("#map-dialog").open = false;
     goToSeat(entry.seat);
   }
 }
@@ -335,21 +331,19 @@ function keyboardSeat(e) {
 }
 $("#seatmap-container").addEventListener("keydown", keyboardSeat);
 $("#expanded-seatmap").addEventListener("keydown", keyboardSeat);
-for (const tab of document.querySelectorAll("[data-floor]"))
-  tab.addEventListener("click", () => {
-    const level = tab.dataset.floor;
-    const arr = seats.filter((s) => s.level === level && s.zone === "M");
-    const middle = arr.reduce(
-      (best, s) =>
-        Math.abs(s.position[0]) + Math.abs(s.row - venue.middleRows[level]) <
-        Math.abs(best.position[0]) +
-          Math.abs(best.row - venue.middleRows[level])
-          ? s
-          : best,
-      arr[0],
-    );
-    goToSeat(middle);
-  });
+$(".floor-tabs").addEventListener("change", (event) => {
+  const level = event.target.value;
+  const arr = seats.filter((s) => s.level === level && s.zone === "M");
+  const middle = arr.reduce(
+    (best, s) =>
+      Math.abs(s.position[0]) + Math.abs(s.row - venue.middleRows[level]) <
+      Math.abs(best.position[0]) + Math.abs(best.row - venue.middleRows[level])
+        ? s
+        : best,
+    arr[0],
+  );
+  goToSeat(middle);
+});
 $("#zone-select").addEventListener("change", () => fillRows());
 $("#row-select").addEventListener("change", () => fillNumbers());
 $("#go-seat").addEventListener("click", () => {
@@ -385,8 +379,10 @@ $("#random-seat").addEventListener("click", () => {
   const available = seats.filter((s) => state.pit || s.zone !== "P");
   goToSeat(available[Math.floor(Math.random() * available.length)]);
 });
-$("#mode-overview").addEventListener("click", setOverview);
-$("#mode-seat").addEventListener("click", () => goToSeat(state.selected));
+$(".view-tabs").addEventListener("change", (event) => {
+  if (event.target.value === "overview") setOverview();
+  else goToSeat(state.selected);
+});
 function restoreNaturalView() {
   camera.zoom = 1;
   setFov(DEFAULT_FOV);
@@ -408,8 +404,11 @@ $("#lighting-toggle").addEventListener("click", () => {
     "aria-pressed",
     String(state.lighting === "show"),
   );
-  $("#lighting-toggle span").textContent =
+  $("#lighting-toggle-tooltip").textContent =
     state.lighting === "show" ? "演出灯光" : "观众厅灯光";
+  const lightingLabel = state.lighting === "show" ? "演出灯光" : "观众厅灯光";
+  $("#lighting-toggle").setAttribute("aria-label", lightingLabel);
+  $("#lighting-toggle .button-label").textContent = lightingLabel;
   toast(state.lighting === "show" ? "已切换演出灯光" : "已切换观众厅灯光");
 });
 $("#fullscreen").addEventListener("click", async () => {
@@ -424,7 +423,10 @@ $("#fullscreen").addEventListener("click", async () => {
 $("#panel-toggle").addEventListener("click", () => {
   const collapsed = $(".seat-panel").classList.toggle("collapsed");
   document.body.classList.toggle("panel-collapsed", collapsed);
-  $("#panel-toggle").innerHTML = icon(collapsed ? "plus" : "minus");
+  $("#panel-toggle").innerHTML = iconButtonContent(
+    collapsed ? "plus" : "minus",
+    collapsed ? "展开选座面板" : "收起选座面板",
+  );
   $("#panel-toggle").setAttribute("aria-expanded", String(!collapsed));
   $("#panel-toggle").setAttribute(
     "aria-label",
@@ -440,29 +442,14 @@ const dialogMap = {
 };
 for (const [button, dialog] of Object.entries(dialogMap))
   $(button).addEventListener("click", () => {
-    $(dialog).showModal();
+    $(dialog).open = true;
     if (dialog === "#map-dialog") renderMaps();
-  });
-for (const b of document.querySelectorAll("[data-close]"))
-  b.addEventListener("click", () => b.closest("dialog").close());
-for (const d of document.querySelectorAll("dialog"))
-  d.addEventListener("click", (e) => {
-    if (e.target === d) {
-      const rect = d.getBoundingClientRect();
-      if (
-        e.clientX < rect.left ||
-        e.clientX > rect.right ||
-        e.clientY < rect.top ||
-        e.clientY > rect.bottom
-      )
-        d.close();
-    }
   });
 $("#reference-title").textContent = "对照真实的" + venue.name;
 $(".reference-tabs").innerHTML = venue.references
   .map(
     (r, i) =>
-      `<button data-reference="${r.file}" class="${i === 0 ? "active" : ""}">${r.label}</button>`,
+      `<wa-button appearance="plain" size="s" data-reference="${r.file}" class="${i === 0 ? "active" : ""}">${r.label}</wa-button>`,
   )
   .join("");
 function showReference(file) {
@@ -485,7 +472,7 @@ $("#model-size-note").textContent = venue.sizeNote;
 $("#venue-name").textContent = venue.name + " · 主剧场";
 $("#current-theatre-name").textContent = venue.name + " · YOUR SEAT";
 $("#venue-select").innerHTML = VENUES.map(
-  (v) => `<option value="${v.id}">${v.name}</option>`,
+  (v) => `<wa-option value="${v.id}">${v.name}</wa-option>`,
 ).join("");
 $("#venue-select").value = venue.id;
 $("#venue-select").addEventListener("change", (e) => {
@@ -495,9 +482,11 @@ $("#venue-select").addEventListener("change", (e) => {
   location.assign(u.href);
 });
 document.title = venue.name + " · 剧场座位视角";
+$("#eye-height").valueFormatter = (value) => `${value} cm`;
+$("#fov").valueFormatter = (value) => `${value}°`;
 function setEyeHeight(value) {
   state.height = value;
-  $("#eye-height").value = String(Math.round(value * 100));
+  $("#eye-height").value = Math.round(value * 100);
   $("#eye-output").textContent = `${Math.round(value * 100)} cm`;
   if (state.mode === "seat") {
     transition = null;
@@ -509,7 +498,7 @@ function setFov(value) {
   state.fov = value;
   camera.fov = value;
   camera.updateProjectionMatrix();
-  $("#fov").value = String(Math.round(value));
+  $("#fov").value = Math.round(value);
   $("#fov-output").textContent = `${Math.round(value)}°`;
 }
 $("#eye-height").addEventListener("input", (e) =>
@@ -588,6 +577,7 @@ $("#export-seat-data").addEventListener("click", () =>
 $("#export-model").addEventListener("click", async () => {
   const b = $("#export-model");
   b.disabled = true;
+  b.loading = true;
   $("#export-status").textContent = "正在打包三维模型，请稍候…";
   try {
     const g = new THREE.Group();
@@ -634,6 +624,7 @@ $("#export-model").addEventListener("click", async () => {
     $("#export-status").textContent = "导出失败：" + e.message;
   } finally {
     b.disabled = false;
+    b.loading = false;
   }
 });
 // Pointer input: seat mode rotates around a stationary eye point; overview uses OrbitControls.

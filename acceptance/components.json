@@ -1,0 +1,324 @@
+{
+  "checkedAt": "2026-10-26T05:44:48.943Z",
+  "library": "Web Awesome 3.14.0",
+  "icons": "Lucide 1.61.0, including all library system icons",
+  "scope": "UI migration only; geometry unchanged",
+  "automatedTests": {
+    "build": "passed",
+    "tests": 12,
+    "failed": 0
+  },
+  "browser": "Authorized independent ego-browser task space 15",
+  "checks": {
+    "venueSwitch": "Shenzhen Poly to Meixihu via selector",
+    "cascade": "Floor, box, row and seat; first/last row; keyboard Home/End/Enter",
+    "segments": "Arrow keys update floor and seat/overview state",
+    "dialog": "Settings, reference, info, expanded map; Escape, light dismiss and focus restoration",
+    "settings": "Eye116 to117cm; FOV75 to74; actor and pit off; reset all defaults",
+    "map": "204 Shenzhen 3F positions; click closes map and selects 3F-M-01-01",
+    "accessibility": "AX tree confirms named action buttons, radio choices, sliders and switches",
+    "exports": {
+      "seats": 1551,
+      "glbBytes": 4733720,
+      "glbHeader": "glTF2 valid",
+      "buttonStates": [
+        {
+          "disabled": true,
+          "loading": true
+        },
+        {
+          "disabled": false,
+          "loading": false
+        }
+      ]
+    },
+    "shortDesktop": {
+      "top": 9.9921875,
+      "bottom": 495.796875,
+      "left": 157.125,
+      "right": 240.5625,
+      "viewport": [
+        1280,
+        720
+      ]
+    },
+    "mobile": [
+      {
+        "width": 390,
+        "height": 844,
+        "layout": {
+          "viewport": [
+            390,
+            844
+          ],
+          "overflow": 0,
+          "list": {
+            "left": 250.875,
+            "right": 361,
+            "top": 10,
+            "bottom": 632.078125
+          },
+          "panel": {
+            "x": 12,
+            "y": 396.8828125,
+            "width": 366,
+            "height": 405.1171875,
+            "top": 396.8828125,
+            "right": 378,
+            "bottom": 802,
+            "left": 12
+          }
+        },
+        "collapsed": {
+          "panel": {
+            "x": 12,
+            "y": 753,
+            "width": 366,
+            "height": 49,
+            "top": 753,
+            "right": 378,
+            "bottom": 802,
+            "left": 12
+          },
+          "card": {
+            "x": 21,
+            "y": 643.5,
+            "width": 164.1953125,
+            "height": 75.5,
+            "top": 643.5,
+            "right": 185.1953125,
+            "bottom": 719,
+            "left": 21
+          }
+        },
+        "modal": {
+          "overflow": 0,
+          "rect": {
+            "x": 55,
+            "y": 240.4875030517578,
+            "width": 280,
+            "height": 363.0250244140625,
+            "top": 240.4875030517578,
+            "right": 335,
+            "bottom": 603.5125274658203,
+            "left": 55
+          }
+        }
+      },
+      {
+        "width": 360,
+        "height": 640,
+        "layout": {
+          "viewport": [
+            360,
+            640
+          ],
+          "overflow": 0,
+          "list": {
+            "left": 233.1796875,
+            "right": 331,
+            "top": 10,
+            "bottom": 526
+          },
+          "panel": {
+            "x": 12,
+            "y": 290.8046875,
+            "width": 336,
+            "height": 307.1953125,
+            "top": 290.8046875,
+            "right": 348,
+            "bottom": 598,
+            "left": 12
+          }
+        },
+        "collapsed": {
+          "panel": {
+            "x": 12,
+            "y": 549,
+            "width": 336,
+            "height": 49,
+            "top": 549,
+            "right": 348,
+            "bottom": 598,
+            "left": 12
+          },
+          "card": {
+            "x": 21,
+            "y": 439.5,
+            "width": 164.1953125,
+            "height": 75.5,
+            "top": 439.5,
+            "right": 185.1953125,
+            "bottom": 515,
+            "left": 21
+          }
+        },
+        "modal": {
+          "overflow": 0,
+          "rect": {
+            "x": 52,
+            "y": 138.4875030517578,
+            "width": 256,
+            "height": 363.0250244140625,
+            "top": 138.4875030517578,
+            "right": 308,
+            "bottom": 501.5125274658203,
+            "left": 52
+          }
+        }
+      },
+      {
+        "width": 320,
+        "height": 640,
+        "layout": {
+          "viewport": [
+            320,
+            640
+          ],
+          "overflow": 0,
+          "list": {
+            "left": 209.5703125,
+            "right": 290.9921875,
+            "top": 10,
+            "bottom": 526
+          },
+          "panel": {
+            "x": 12,
+            "y": 290.8046875,
+            "width": 296,
+            "height": 307.1953125,
+            "top": 290.8046875,
+            "right": 308,
+            "bottom": 598,
+            "left": 12
+          }
+        },
+        "collapsed": {
+          "panel": {
+            "x": 12,
+            "y": 549,
+            "width": 296,
+            "height": 49,
+            "top": 549,
+            "right": 308,
+            "bottom": 598,
+            "left": 12
+          },
+          "card": {
+            "x": 21,
+            "y": 439.5,
+            "width": 164.1953125,
+            "height": 75.5,
+            "top": 439.5,
+            "right": 185.1953125,
+            "bottom": 515,
+            "left": 21
+          }
+        },
+        "modal": {
+          "overflow": 0,
+          "rect": {
+            "x": 48,
+            "y": 138.4875030517578,
+            "width": 224,
+            "height": 363.0250244140625,
+            "top": 138.4875030517578,
+            "right": 272,
+            "bottom": 501.5125274658203,
+            "left": 48
+          }
+        }
+      }
+    ],
+    "finalModal": {
+      "rect": {
+        "x": 20,
+        "y": 195.109375,
+        "width": 350,
+        "height": 453.78125,
+        "top": 195.109375,
+        "right": 370,
+        "bottom": 648.890625,
+        "left": 20
+      },
+      "overflow": 0
+    },
+    "icons": [
+      {
+        "name": "chevron-down",
+        "library": "system",
+        "use": "http://127.0.0.1:4173/icons.svg#chevron-down",
+        "viewBox": "0 0 24 24"
+      },
+      {
+        "name": "check",
+        "library": "system",
+        "use": "http://127.0.0.1:4173/icons.svg#check",
+        "viewBox": "0 0 24 24"
+      },
+      {
+        "name": "chevron-down",
+        "library": "system",
+        "use": "http://127.0.0.1:4173/icons.svg#chevron-down",
+        "viewBox": "0 0 24 24"
+      },
+      {
+        "name": "check",
+        "library": "system",
+        "use": "http://127.0.0.1:4173/icons.svg#check",
+        "viewBox": "0 0 24 24"
+      },
+      {
+        "name": "chevron-down",
+        "library": "system",
+        "use": "http://127.0.0.1:4173/icons.svg#chevron-down",
+        "viewBox": "0 0 24 24"
+      },
+      {
+        "name": "check",
+        "library": "system",
+        "use": "http://127.0.0.1:4173/icons.svg#check",
+        "viewBox": "0 0 24 24"
+      },
+      {
+        "name": "chevron-down",
+        "library": "system",
+        "use": "http://127.0.0.1:4173/icons.svg#chevron-down",
+        "viewBox": "0 0 24 24"
+      },
+      {
+        "name": "check",
+        "library": "system",
+        "use": "http://127.0.0.1:4173/icons.svg#check",
+        "viewBox": "0 0 24 24"
+      },
+      {
+        "name": "xmark",
+        "library": "system",
+        "use": "http://127.0.0.1:4173/icons.svg#x",
+        "viewBox": "0 0 24 24"
+      },
+      {
+        "name": "xmark",
+        "library": "system",
+        "use": "http://127.0.0.1:4173/icons.svg#x",
+        "viewBox": "0 0 24 24"
+      },
+      {
+        "name": "xmark",
+        "library": "system",
+        "use": "http://127.0.0.1:4173/icons.svg#x",
+        "viewBox": "0 0 24 24"
+      },
+      {
+        "name": "xmark",
+        "library": "system",
+        "use": "http://127.0.0.1:4173/icons.svg#x",
+        "viewBox": "0 0 24 24"
+      }
+    ],
+    "externalRequests": [],
+    "runtimeErrors": []
+  },
+  "limitations": "Browser QA validates software behavior and layout, not measured theatre fidelity."
+}

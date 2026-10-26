@@ -2,7 +2,7 @@
 
 面向不同剧场的三维重建与逐座观演视角项目。版本 0.3.0，已收录梅溪湖大剧院和深圳保利剧院的主剧场。
 
-以公开平剖面、观众厅照片和座位图制作可编辑三维模型。前端使用 Three.js，所有运行依赖随包提供，无需 CDN、API Key 或后端。
+以公开平剖面、观众厅照片和座位图制作可编辑三维模型。前端使用 Three.js 与 Web Awesome 组件库，所有运行依赖随包提供，无需 CDN、API Key 或后端。
 
 源码仓库：[hugozhou-ai/theatre-seat-view](https://github.com/hugozhou-ai/theatre-seat-view)（公开）。
 GitHub Pages：[在线体验](https://hugozhou-ai.github.io/theatre-seat-view/)。部署状态见 [GitHub Actions](https://github.com/hugozhou-ai/theatre-seat-view/actions/workflows/pages.yml)。
@@ -113,4 +113,13 @@ npm run dev
 
 ## Agent 规则与图标
 
-开发规则见仓库根目录 `AGENTS.md`。所有界面图标统一使用锁定版本的 Lucide（`lucide-static`），名称集中在 `src/icons.js`。构建时按需生成本地 SVG sprite、favicon 和下拉箭头，保留 `dist/vendor/LUCIDE-LICENSE.txt`。静态图标使用 `data-icon` 占位符，动态状态调用 `icon()`；禁止通过 emoji、Unicode 符号或自绘 SVG 模拟界面图标。
+开发规则见仓库根目录 `AGENTS.md`。所有界面图标统一使用锁定版本的 Lucide（`lucide-static`），名称集中在 `src/icons.js`。构建时按需生成本地 SVG sprite 和 favicon，保留 `dist/vendor/LUCIDE-LICENSE.txt`。静态图标使用 `data-icon` 占位符，动态状态调用 `icon()`；禁止通过 emoji、Unicode 符号或自绘 SVG 模拟界面图标。
+
+
+## 界面组件
+
+采用 [Web Awesome](https://webawesome.com/docs) 3.14.0 的免费 Web Components，可直接集成当前 JavaScript / Three.js 架构。选择器、弹窗、滑块、开关、按钮、分段选择及工具提示统一使用组件库，主题延续米白与深绿配色。
+
+`src/components.js` 按需注册组件、中文语言包以及 Lucide 的默认/系统图标映射。`scripts/build.mjs` 使用 esbuild 将依赖打包为本地 ESM 与主题 CSS，支持 GitHub Pages 子路径，无需账户、外部图标服务或 CDN。许可证保留在 `dist/vendor/WEB-AWESOME-LICENSE.txt` 和生成包的 `.LEGAL.txt` 中。
+
+楼层和视图模式支持方向键切换，下拉框支持键盘选择，弹窗支持 Esc 与点击遮罩关闭并恢复焦点。组件切换不会改变座位数据、模型几何或默认 75° 自然视角。

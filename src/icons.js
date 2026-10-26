@@ -22,10 +22,16 @@ export const ICON_NAMES = Object.freeze([
   "external-link",
   "x",
   "chevron-down",
+  "check",
+  "circle",
 ]);
 const spriteUrl = new URL("../icons.svg", import.meta.url).href;
 export function icon(name, sprite = spriteUrl) {
   if (!ICON_NAMES.includes(name))
     throw new Error("Unknown Lucide icon: " + name);
   return `<svg class="icon" data-icon="${name}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><use href="${sprite}#${name}"></use></svg>`;
+}
+
+export function iconButtonContent(name, label) {
+  return `${icon(name)}<span class="sr-only button-label">${label}</span>`;
 }

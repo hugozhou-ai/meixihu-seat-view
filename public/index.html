@@ -10,6 +10,7 @@
       content="探索剧场三维空间，选择座位，查看坐姿观演视角。收录梅溪湖大剧院与深圳保利剧院主剧场，依据公开图纸与照片重建。"
     />
     <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="./vendor/webawesome.css" />
     <link rel="stylesheet" href="./style.css" />
     <script type="importmap">
       { "imports": { "three": "./vendor/three.module.js" } }
@@ -33,66 +34,92 @@
           <span id="venue-name">主剧场 · 三维观演</span>
         </div>
         <div class="header-actions">
-          <button id="reference-open" class="button subtle">
-            <i data-icon="images"></i> 对照实景</button
-          ><button
+          <wa-button
+            appearance="plain"
+            size="s"
+            id="reference-open"
+            class="button subtle"
+          >
+            <i data-icon="images"></i> 对照实景</wa-button
+          ><wa-button
+            appearance="plain"
+            size="s"
             id="info-open"
             class="icon-button"
             aria-label="查看模型依据与精度"
           >
             <i data-icon="info"></i>
-          </button>
+            <span class="sr-only button-label"
+              >查看模型依据与精度</span
+            ></wa-button
+          >
         </div>
       </header>
       <aside class="seat-panel" aria-label="座位选择">
         <div class="panel-title">
-          <label class="venue-picker"
-            >选择剧场<select id="venue-select" aria-label="选择剧场"></select
-          ></label>
+          <wa-select
+            class="venue-picker"
+            id="venue-select"
+            label="选择剧场"
+            size="s"
+          ></wa-select>
           <span class="eyebrow">FIND YOUR PERSPECTIVE</span>
           <div>
             <h1>从这里，看见舞台。</h1>
-            <button
+            <wa-button
+              appearance="plain"
+              size="s"
               id="panel-toggle"
               class="icon-button"
               aria-label="收起选座面板"
               aria-expanded="true"
             >
               <i data-icon="minus"></i>
-            </button>
+              <span class="sr-only button-label">收起选座面板</span></wa-button
+            >
           </div>
           <p>选一个座位，走进你的观演位置。</p>
         </div>
         <div id="panel-body">
-          <div class="floor-tabs" role="tablist" aria-label="观众席楼层">
-            <button
-              role="tab"
+          <wa-radio-group
+            class="floor-tabs"
+            label="观众席楼层"
+            orientation="horizontal"
+            value="1F"
+            size="s"
+          >
+            <wa-radio
+              appearance="button"
               id="floor-1F"
+              value="1F"
               data-floor="1F"
-              aria-selected="true"
+              >一层<span>池座</span></wa-radio
             >
-              一层<span>池座</span></button
-            ><button
-              role="tab"
+            <wa-radio
+              appearance="button"
               id="floor-2F"
+              value="2F"
               data-floor="2F"
-              aria-selected="false"
+              >二层<span>楼座</span></wa-radio
             >
-              二层<span>楼座</span></button
-            ><button
-              role="tab"
+            <wa-radio
+              appearance="button"
               id="floor-3F"
+              value="3F"
               data-floor="3F"
-              aria-selected="false"
+              >三层<span>楼座</span></wa-radio
             >
-              三层<span>楼座</span>
-            </button>
-          </div>
+          </wa-radio-group>
           <div class="map-heading">
             <span id="floor-count"></span
-            ><button id="map-expand" class="text-button">
+            ><wa-button
+              appearance="plain"
+              size="s"
+              id="map-expand"
+              class="text-button"
+            >
               放大选座图 <i data-icon="expand"></i>
-            </button>
+            </wa-button>
           </div>
           <div id="seatmap-container" class="seatmap-container"></div>
           <div class="map-legend">
@@ -101,51 +128,67 @@
             ><span><i data-icon="arrow-up"></i> 舞台方向</span>
           </div>
           <div class="seat-form">
-            <label
-              >区域<select
-                id="zone-select"
-                aria-label="选择区域"
-              ></select></label
-            ><label
-              >排<select id="row-select" aria-label="选择排"></select></label
-            ><label
-              >座<select id="number-select" aria-label="选择座"></select
-            ></label>
+            <wa-select id="zone-select" label="区域" size="s"></wa-select>
+            <wa-select id="row-select" label="排" size="s"></wa-select>
+            <wa-select id="number-select" label="座" size="s"></wa-select>
           </div>
-          <button id="go-seat" class="button primary">
+          <wa-button
+            appearance="plain"
+            size="s"
+            id="go-seat"
+            class="button primary"
+          >
             <i data-icon="crosshair"></i> 查看这个座位的视角
             <i data-icon="arrow-right"></i>
-          </button>
+          </wa-button>
           <p class="numbering-note">当前使用重建编号 · 票面座号尚待核对</p>
           <div class="panel-footer">
             <span>探索其他位置</span>
             <div>
-              <button
+              <wa-button
+                appearance="plain"
+                size="s"
                 id="seat-prev"
                 class="icon-button"
                 aria-label="上一个座位"
               >
-                <i data-icon="arrow-left"></i></button
-              ><button
+                <i data-icon="arrow-left"></i
+                ><span class="sr-only button-label">上一个座位</span></wa-button
+              ><wa-button
+                appearance="plain"
+                size="s"
                 id="seat-next"
                 class="icon-button"
                 aria-label="下一个座位"
               >
-                <i data-icon="arrow-right"></i></button
-              ><button id="random-seat" class="text-button">
+                <i data-icon="arrow-right"></i
+                ><span class="sr-only button-label">下一个座位</span></wa-button
+              ><wa-button
+                appearance="plain"
+                size="s"
+                id="random-seat"
+                class="text-button"
+              >
                 随机入座 <i data-icon="shuffle"></i>
-              </button>
+              </wa-button>
             </div>
           </div>
         </div>
       </aside>
-      <nav class="view-tabs" aria-label="视图模式">
-        <button id="mode-seat" class="active" aria-pressed="true">
-          <i data-icon="armchair"></i> 座位视角</button
-        ><button id="mode-overview" aria-pressed="false">
-          <i data-icon="box"></i> 剧场总览
-        </button>
-      </nav>
+      <wa-radio-group
+        class="view-tabs"
+        label="视图模式"
+        orientation="horizontal"
+        value="seat"
+        size="s"
+      >
+        <wa-radio appearance="button" id="mode-seat" value="seat"
+          ><i data-icon="armchair"></i> 座位视角</wa-radio
+        >
+        <wa-radio appearance="button" id="mode-overview" value="overview"
+          ><i data-icon="box"></i> 剧场总览</wa-radio
+        >
+      </wa-radio-group>
       <section class="seat-card" aria-label="当前座位信息" aria-live="polite">
         <span class="eyebrow" id="current-theatre-name">YOUR SEAT</span>
         <h2 id="selected-label">正在载入</h2>
@@ -156,86 +199,136 @@
         <span id="seat-id" class="seat-id"></span>
       </section>
       <div class="viewer-tools">
-        <button
+        <wa-button
+          appearance="plain"
+          size="s"
           id="reset-view"
           class="tool-button"
           aria-label="恢复自然视角并面向舞台"
         >
-          <i data-icon="crosshair"></i><span>自然视角</span></button
-        ><button id="look-back" class="tool-button" aria-label="回望观众厅">
-          <i data-icon="rotate-ccw"></i><span>回望观众厅</span></button
-        ><button id="lighting-toggle" class="tool-button" aria-pressed="false">
-          <i data-icon="sun"></i><span>观众厅灯光</span></button
-        ><button id="settings-open" class="tool-button">
-          <i data-icon="settings-2"></i><span>视角设置</span></button
-        ><button id="fullscreen" class="tool-button">
-          <i data-icon="maximize"></i><span>全屏</span>
-        </button>
+          <i data-icon="crosshair"></i
+          ><span class="sr-only button-label"
+            >恢复自然视角并面向舞台</span
+          ></wa-button
+        ><wa-tooltip id="reset-view-tooltip" for="reset-view" placement="left"
+          >自然视角</wa-tooltip
+        ><wa-button
+          appearance="plain"
+          size="s"
+          id="look-back"
+          class="tool-button"
+          aria-label="回望观众厅"
+        >
+          <i data-icon="rotate-ccw"></i
+          ><span class="sr-only button-label">回望观众厅</span></wa-button
+        ><wa-tooltip id="look-back-tooltip" for="look-back" placement="left"
+          >回望观众厅</wa-tooltip
+        ><wa-button
+          appearance="plain"
+          size="s"
+          id="lighting-toggle"
+          class="tool-button"
+          aria-pressed="false"
+          aria-label="观众厅灯光"
+        >
+          <i data-icon="sun"></i
+          ><span class="sr-only button-label">观众厅灯光</span></wa-button
+        ><wa-tooltip
+          id="lighting-toggle-tooltip"
+          for="lighting-toggle"
+          placement="left"
+          >观众厅灯光</wa-tooltip
+        ><wa-button
+          appearance="plain"
+          size="s"
+          id="settings-open"
+          class="tool-button"
+          aria-label="视角设置"
+        >
+          <i data-icon="settings-2"></i
+          ><span class="sr-only button-label">视角设置</span></wa-button
+        ><wa-tooltip
+          id="settings-open-tooltip"
+          for="settings-open"
+          placement="left"
+          >视角设置</wa-tooltip
+        ><wa-button
+          appearance="plain"
+          size="s"
+          id="fullscreen"
+          class="tool-button"
+          aria-label="全屏"
+        >
+          <i data-icon="maximize"></i>
+          <span class="sr-only button-label">全屏</span></wa-button
+        ><wa-tooltip id="fullscreen-tooltip" for="fullscreen" placement="left"
+          >全屏</wa-tooltip
+        >
       </div>
       <div class="viewer-hint" id="viewer-hint">
         <i data-icon="move-horizontal"></i> 拖动转头 · 自然观演视角
       </div>
       <footer class="bottom-bar">
-        <button id="provenance-open">
+        <wa-button appearance="plain" size="s" id="provenance-open">
           <i class="status-dot"></i>依据公开资料重建 <span>· 尺寸待校准</span>
-          <i data-icon="info"></i></button
+          <i data-icon="info"></i></wa-button
         ><span id="render-status">正在加载场景</span>
       </footer>
       <div id="toast" role="status"></div>
     </main>
-    <dialog id="settings-dialog" class="small-dialog">
-      <div class="dialog-heading">
-        <h2>视角设置</h2>
-        <button data-close class="icon-button" aria-label="关闭设置">
-          <i data-icon="x"></i>
-        </button>
+    <wa-dialog
+      light-dismiss
+      id="settings-dialog"
+      label="视角设置"
+      class="small-dialog"
+    >
+      <div class="dialog-heading" slot="label">
+        <span class="dialog-title">视角设置</span>
       </div>
       <p>默认采用 75° 自然视野。可手动调整，所有座位共用相同参数。</p>
-      <label class="range-label"
-        >坐姿眼高 <output id="eye-output">116 cm</output
-        ><input
-          id="eye-height"
-          type="range"
-          min="95"
-          max="140"
-          value="116"
-          step="1" /></label
-      ><label class="range-label"
-        >垂直视场角 <output id="fov-output">75°</output
-        ><input
-          id="fov"
-          type="range"
-          min="35"
-          max="85"
-          value="75"
-          step="1" /></label
-      ><label class="check-label"
-        ><input
-          id="actor-toggle"
-          type="checkbox"
-          checked
-        />显示舞台人物，辅助感知比例</label
-      ><label class="check-label"
-        ><input
-          id="pit-toggle"
-          type="checkbox"
-          checked
-        />显示乐池活动座椅</label
+      <wa-slider
+        id="eye-height"
+        min="95"
+        max="140"
+        value="116"
+        step="1"
+        with-tooltip
       >
+        <span slot="label" class="slider-label"
+          >坐姿眼高 <output id="eye-output">116 cm</output></span
+        >
+      </wa-slider>
+      <wa-slider id="fov" min="35" max="85" value="75" step="1" with-tooltip>
+        <span slot="label" class="slider-label"
+          >垂直视场角 <output id="fov-output">75°</output></span
+        >
+      </wa-slider>
+      <wa-switch id="actor-toggle" size="s" checked
+        >显示舞台人物，辅助感知比例</wa-switch
+      >
+      <wa-switch id="pit-toggle" size="s" checked>显示乐池活动座椅</wa-switch>
       <div class="dialog-note">
         眼高相对于所在座位地坪。这里展示空场视角，不包含前排观众身体造成的遮挡。
       </div>
-      <button id="settings-reset" class="button subtle">恢复默认参数</button>
-    </dialog>
-    <dialog id="reference-dialog" class="reference-dialog">
-      <div class="dialog-heading">
+      <wa-button
+        appearance="plain"
+        size="s"
+        id="settings-reset"
+        class="button subtle"
+        >恢复默认参数</wa-button
+      >
+    </wa-dialog>
+    <wa-dialog
+      light-dismiss
+      id="reference-dialog"
+      label="实景与资料对照"
+      class="reference-dialog"
+    >
+      <div class="dialog-heading" slot="label">
         <div>
           <span class="eyebrow">VISUAL REFERENCES</span>
-          <h2 id="reference-title">实景与资料对照</h2>
+          <span class="dialog-title" id="reference-title">实景与资料对照</span>
         </div>
-        <button data-close class="icon-button" aria-label="关闭实景对照">
-          <i data-icon="x"></i>
-        </button>
       </div>
       <div class="reference-tabs"></div>
       <img
@@ -244,16 +337,18 @@
         alt="梅溪湖大剧院观众厅实景，摄影Virgile Simon Bertrand"
       />
       <p id="reference-caption"></p>
-    </dialog>
-    <dialog id="info-dialog" class="info-dialog">
-      <div class="dialog-heading">
+    </wa-dialog>
+    <wa-dialog
+      light-dismiss
+      id="info-dialog"
+      label="模型依据与当前精度"
+      class="info-dialog"
+    >
+      <div class="dialog-heading" slot="label">
         <div>
           <span class="eyebrow">MODEL NOTES</span>
-          <h2>模型依据与当前精度</h2>
+          <span class="dialog-title">模型依据与当前精度</span>
         </div>
-        <button data-close class="icon-button" aria-label="关闭模型说明">
-          <i data-icon="x"></i>
-        </button>
       </div>
       <div class="notice">
         这是依据公开图纸与实景照片建立的三维重建模型。座位布局、尺寸和坐姿眼点仍含估算，不能作为真实座位视线的测量证明。
@@ -271,26 +366,38 @@
         </dd>
       </dl>
       <div id="source-links"></div>
-      <button id="export-seat-data" class="button subtle">
-        下载当前座位坐标 JSON <i data-icon="download"></i></button
-      ><button id="export-model" class="button subtle">
+      <wa-button
+        appearance="plain"
+        size="s"
+        id="export-seat-data"
+        class="button subtle"
+      >
+        下载当前座位坐标 JSON <i data-icon="download"></i></wa-button
+      ><wa-button
+        appearance="plain"
+        size="s"
+        id="export-model"
+        class="button subtle"
+      >
         导出当前三维模型 GLB <i data-icon="download"></i>
-      </button>
+      </wa-button>
       <p class="export-note" id="export-status"></p>
-    </dialog>
-    <dialog id="map-dialog" class="map-dialog">
-      <div class="dialog-heading">
+    </wa-dialog>
+    <wa-dialog
+      light-dismiss
+      id="map-dialog"
+      label="放大选座图"
+      class="map-dialog"
+    >
+      <div class="dialog-heading" slot="label">
         <div>
           <span class="eyebrow">CHOOSE A SEAT</span>
-          <h2 id="expanded-map-title">放大选座图</h2>
+          <span class="dialog-title" id="expanded-map-title">放大选座图</span>
         </div>
-        <button data-close class="icon-button" aria-label="关闭放大座位图">
-          <i data-icon="x"></i>
-        </button>
       </div>
       <div id="expanded-seatmap"></div>
       <p>点击任意圆点入座。当前标注为重建编号。</p>
-    </dialog>
+    </wa-dialog>
     <script type="module" src="./src/app.js"></script>
   </body>
 </html>
