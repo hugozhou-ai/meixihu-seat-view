@@ -86,6 +86,8 @@ npm run dev
 
 ## 编辑入口
 
+新增剧场或校准模型时，使用项目公共 skill [`theatre-reconstruction`](.agents/skills/theatre-reconstruction/SKILL.md)：覆盖资料检索、来源与精度标注、座位重建、室内建模、眼点交互及验收。可向 agent 说明“使用 $theatre-reconstruction 新增某剧院主剧场模型”；其他 agent 可从 `AGENTS.md` 进入同一流程。
+
 - `src/venues.js`：剧场注册、独立模型构建入口、参考资料、默认座位与精度说明。
 - `src/poly-layout.js`：深圳逐排数量、包厢分区和估算坐标。
 - `src/poly-theatre.js`：深圳独立室内建筑与材质。

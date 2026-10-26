@@ -1,0 +1,3 @@
+interface:
+  display_name: "剧场室内三维重建"
+  short_description: "收集剧场平剖面与座位图，重建主剧场室内及逐座视角并验收"
