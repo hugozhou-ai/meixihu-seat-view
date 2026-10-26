@@ -2,8 +2,8 @@
 
 版本 0.2.0。以公开平剖面、观众厅照片和座位图重建的可编辑三维模型。前端使用 Three.js，所有运行依赖随包提供，无需 CDN、API Key 或后端。仅包含主剧场内部。
 
-源码仓库：[hugozhou-ai/meixihu-seat-view](https://github.com/hugozhou-ai/meixihu-seat-view)（私有）。
-GitHub Pages 目标地址：`https://hugozhou-ai.github.io/meixihu-seat-view/`（尚未上线）。2026-10-26 启用时 GitHub 返回 HTTP 422：当前账号套餐不支持私有仓库 Pages。需升级支持的套餐，或单独使用公开部署仓库。源码已推送且保持私有；云端构建与测试已通过，发布被上述账号限制阻止。
+源码仓库：[hugozhou-ai/meixihu-seat-view](https://github.com/hugozhou-ai/meixihu-seat-view)（公开）。
+GitHub Pages：[在线体验](https://hugozhou-ai.github.io/meixihu-seat-view/)。部署状态见 [GitHub Actions](https://github.com/hugozhou-ai/meixihu-seat-view/actions/workflows/pages.yml)。
 
 ## 使用
 
@@ -18,7 +18,7 @@ npm run dev
 
 ## 项目与部署
 
-`.github/workflows/pages.yml` 在推送到 `main` 或手动触发时，依次安装锁定依赖、构建、运行测试、上传 `dist/` 并部署 GitHub Pages。仓库 Settings → Pages 的构建来源应为 GitHub Actions。私有仓库启用 Pages 需要 GitHub 账号套餐支持。
+`.github/workflows/pages.yml` 在推送到 `main` 或手动触发时，依次安装锁定依赖、构建、运行测试、上传 `dist/` 并部署 GitHub Pages。仓库 Settings → Pages 的构建来源为 GitHub Actions，已启用 HTTPS。
 
 所有网页入口与参考图片使用相对地址，支持 `/meixihu-seat-view/` 项目路径及 `?seat=...` 定位。`tests/deployment.test.mjs` 检查入口资源、传递模块依赖和对照图路径，防止资源错误请求到 github.io 域名根目录。
 
