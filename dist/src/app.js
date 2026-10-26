@@ -451,7 +451,10 @@ for (const b of document.querySelectorAll("[data-reference]"))
   b.addEventListener("click", () => {
     for (const a of document.querySelectorAll("[data-reference]"))
       a.classList.toggle("active", a === b);
-    $("#reference-image").src = "/reference/" + b.dataset.reference;
+    $("#reference-image").src = new URL(
+      "../reference/" + b.dataset.reference,
+      import.meta.url,
+    ).href;
     $("#reference-image").alt = b.textContent + "：梅溪湖大剧院公开参考资料";
     $("#reference-caption").textContent = b.dataset.reference.startsWith(
       "auditorium",

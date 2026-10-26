@@ -2,16 +2,29 @@
 
 版本 0.2.0。以公开平剖面、观众厅照片和座位图重建的可编辑三维模型。前端使用 Three.js，所有运行依赖随包提供，无需 CDN、API Key 或后端。仅包含主剧场内部。
 
+源码仓库：[hugozhou-ai/meixihu-seat-view](https://github.com/hugozhou-ai/meixihu-seat-view)（私有）。
+GitHub Pages 配置地址：[在线体验](https://hugozhou-ai.github.io/meixihu-seat-view/)。Pages 页面面向互联网公开，源码仓库保持私有；发布状态见仓库 Actions。
+
 ## 使用
 
 ```sh
 npm ci
-npm test
 npm run build
+npm test
 npm run dev
 ```
 
-打开 http://127.0.0.1:4173 。也可将 `dist/` 直接部署到支持静态文件的站点根目录；不要用 file:// 双击 HTML。
+推荐 Node.js 22。打开 http://127.0.0.1:4173 。也可将 `dist/` 直接部署到支持静态文件的站点根目录或子目录；不要用 file:// 双击 HTML。
+
+## 项目与部署
+
+`.github/workflows/pages.yml` 在推送到 `main` 或手动触发时，依次安装锁定依赖、构建、运行测试、上传 `dist/` 并部署 GitHub Pages。仓库 Settings → Pages 的构建来源应为 GitHub Actions。私有仓库启用 Pages 需要 GitHub 账号套餐支持。
+
+所有网页入口与参考图片使用相对地址，支持 `/meixihu-seat-view/` 项目路径及 `?seat=...` 定位。`tests/deployment.test.mjs` 检查入口资源、传递模块依赖和对照图路径，防止资源错误请求到 github.io 域名根目录。
+
+`artifacts/` 保存 GLB、座位坐标和验收截图；`acceptance/` 保存测试记录。这两个目录不作为 Pages 发布内容。公开参考图位于 `public/reference/`，随网页提供实景对照。
+
+`.openai/hosting.json` 保留原 Sites 站点标识，GitHub Actions 不使用它。原 Sites 页面与 GitHub Pages 分别部署，推送 GitHub 不会自动更新原 Sites 页面。
 
 - 点击座位图，或选择楼层、区域、排、座后入座。总览模式下也可点击可见三维座椅。
 - 座位视角中拖动转头，滚轮调整视野；相机始终固定在该座位的坐姿眼点。
