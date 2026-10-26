@@ -1,9 +1,13 @@
-# 梅溪湖大剧院主剧场 · 座位视角
+# Theatre Seat View · 剧场座位视角
 
-版本 0.2.0。以公开平剖面、观众厅照片和座位图重建的可编辑三维模型。前端使用 Three.js，所有运行依赖随包提供，无需 CDN、API Key 或后端。仅包含主剧场内部。
+面向不同剧场的三维重建与逐座观演视角项目。版本 0.2.0，目前已收录梅溪湖大剧院主剧场，后续将在同一项目中扩展其他剧场。
 
-源码仓库：[hugozhou-ai/meixihu-seat-view](https://github.com/hugozhou-ai/meixihu-seat-view)（公开）。
-GitHub Pages：[在线体验](https://hugozhou-ai.github.io/meixihu-seat-view/)。部署状态见 [GitHub Actions](https://github.com/hugozhou-ai/meixihu-seat-view/actions/workflows/pages.yml)。
+以公开平剖面、观众厅照片和座位图制作可编辑三维模型。前端使用 Three.js，所有运行依赖随包提供，无需 CDN、API Key 或后端。
+
+源码仓库：[hugozhou-ai/theatre-seat-view](https://github.com/hugozhou-ai/theatre-seat-view)（公开）。
+GitHub Pages：[在线体验](https://hugozhou-ai.github.io/theatre-seat-view/)。部署状态见 [GitHub Actions](https://github.com/hugozhou-ai/theatre-seat-view/actions/workflows/pages.yml)。
+
+本地开发目录：`/Users/vector/Documents/CODES/WORK_SPACE_B/theatre-seat-view`。
 
 ## 使用
 
@@ -20,7 +24,7 @@ npm run dev
 
 `.github/workflows/pages.yml` 在推送到 `main` 或手动触发时，依次安装锁定依赖、构建、运行测试、上传 `dist/` 并部署 GitHub Pages。仓库 Settings → Pages 的构建来源为 GitHub Actions，已启用 HTTPS。
 
-所有网页入口与参考图片使用相对地址，支持 `/meixihu-seat-view/` 项目路径及 `?seat=...` 定位。`tests/deployment.test.mjs` 检查入口资源、传递模块依赖和对照图路径，防止资源错误请求到 github.io 域名根目录。
+所有网页入口与参考图片使用相对地址，支持 `/theatre-seat-view/` 项目路径及 `?seat=...` 定位。`tests/deployment.test.mjs` 检查入口资源、传递模块依赖和对照图路径，防止资源错误请求到 github.io 域名根目录。
 
 `artifacts/` 保存 GLB、座位坐标和验收截图；`acceptance/` 保存测试记录。这两个目录不作为 Pages 发布内容。公开参考图位于 `public/reference/`，随网页提供实景对照。
 
@@ -35,6 +39,8 @@ npm run dev
 - 手机上可收起选座面板以扩大三维画面。
 
 ## 数据与精度
+
+以下数据和公开参考对应当前收录的梅溪湖大剧院主剧场；模型、照片与导出文件保留剧场名称，便于后续与其他剧场区分。
 
 | 区域 | 位置数 | 依据 |
 | --- | ---: | --- |

@@ -6,7 +6,7 @@ const root = new URL("../dist/", import.meta.url);
 const html = await readFile(new URL("index.html", root), "utf8");
 
 test("all entry assets and transitive modules stay within a project Pages path", async () => {
-  const site = new URL("https://example.github.io/meixihu-seat-view/");
+  const site = new URL("https://example.github.io/theatre-seat-view/");
   const imports = JSON.parse(html.match(/<script type="importmap">([\s\S]*?)<\/script>/)[1]).imports;
   const resources = [...html.matchAll(/(?:src|href)="([^"]+)"/g)]
     .map((m) => m[1])
@@ -35,10 +35,10 @@ test("all entry assets and transitive modules stay within a project Pages path",
 });
 
 test("every reference tab resolves relative to the application module", async () => {
-  const module = new URL("https://example.github.io/meixihu-seat-view/src/app.js");
+  const module = new URL("https://example.github.io/theatre-seat-view/src/app.js");
   for (const m of html.matchAll(/data-reference="([^"]+)"/g)) {
     const asset = new URL("../reference/" + m[1], module);
-    assert.ok(asset.pathname.startsWith("/meixihu-seat-view/reference/"));
+    assert.ok(asset.pathname.startsWith("/theatre-seat-view/reference/"));
     assert.ok((await stat(new URL("reference/" + m[1], root))).isFile());
   }
 });
