@@ -3,7 +3,7 @@
 版本 0.2.0。以公开平剖面、观众厅照片和座位图重建的可编辑三维模型。前端使用 Three.js，所有运行依赖随包提供，无需 CDN、API Key 或后端。仅包含主剧场内部。
 
 源码仓库：[hugozhou-ai/meixihu-seat-view](https://github.com/hugozhou-ai/meixihu-seat-view)（私有）。
-GitHub Pages 配置地址：[在线体验](https://hugozhou-ai.github.io/meixihu-seat-view/)。Pages 页面面向互联网公开，源码仓库保持私有；发布状态见仓库 Actions。
+GitHub Pages 目标地址：`https://hugozhou-ai.github.io/meixihu-seat-view/`（尚未上线）。2026-10-26 启用时 GitHub 返回 HTTP 422：当前账号套餐不支持私有仓库 Pages。需升级支持的套餐，或单独使用公开部署仓库。源码已推送且保持私有；云端构建与测试已通过，发布被上述账号限制阻止。
 
 ## 使用
 
