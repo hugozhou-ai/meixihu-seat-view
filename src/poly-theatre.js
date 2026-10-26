@@ -8,7 +8,8 @@ import {
   surface,
   tube,
 } from "./theatre-common.js";
-import { POLY_ROWS, polyRowGeometry } from "./poly-layout.js";
+import { POLY_ROWS, polyRowGeometry, POLY_STAGE } from "./poly-layout.js";
+import { buildStageActors } from "./stage-actors.js";
 export function buildPolyTheatre(seats) {
   const root = new THREE.Group();
   root.name = "Shenzhen_Poly_Theatre_Interior";
@@ -380,27 +381,7 @@ export function buildPolyTheatre(seats) {
       [0, 17.6 - 0.022 * z, z],
       "Ceiling_Technical_Slot",
     );
-  const actor = new THREE.Group();
-  actor.name = "Stage_Scale_Reference";
-  actor.position.set(0, 0, -4);
-  const human = mat("#d1c9b7");
-  const torso = new THREE.Mesh(
-    new THREE.CapsuleGeometry(0.2, 0.7, 4, 8),
-    human,
-  );
-  torso.position.y = 1;
-  actor.add(torso);
-  const head = new THREE.Mesh(new THREE.SphereGeometry(0.115, 10, 8), human);
-  head.position.y = 1.65;
-  actor.add(head);
-  for (const sign of [-1, 1]) {
-    const leg = new THREE.Mesh(
-      new THREE.CapsuleGeometry(0.075, 0.65, 3, 6),
-      human,
-    );
-    leg.position.set(sign * 0.11, 0.38, 0);
-    actor.add(leg);
-  }
+  const actor = buildStageActors(POLY_STAGE);
   architecture.add(actor);
   const chairs = addSeating(root, seats, {
     seatMat: red,

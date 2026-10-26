@@ -8,7 +8,8 @@ import {
   surface,
   tube,
 } from "./theatre-common.js";
-import { ROW_COUNTS, BALCONY_PARAMETERS, balconyHeight } from "./layout.js";
+import { ROW_COUNTS, BALCONY_PARAMETERS, balconyHeight, STAGE } from "./layout.js";
+import { buildStageActors } from "./stage-actors.js";
 const TAU = Math.PI * 2;
 function woodTexture() {
   const canvas = document.createElement("canvas");
@@ -597,31 +598,8 @@ export function buildTheatre(seats) {
     );
     lamp.rotation.x = 0.35;
   }
-  // Stage scale reference, unobtrusive performer at centre.
-  const actor = new THREE.Group();
-  actor.name = "Stage_Scale_Reference";
-  actor.position.set(0, 0, -4);
-  const outfit = new THREE.MeshStandardMaterial({
-    color: "#c5c0af",
-    roughness: 0.8,
-  });
-  const body = new THREE.Mesh(
-    new THREE.CapsuleGeometry(0.2, 0.7, 4, 8),
-    outfit,
-  );
-  body.position.y = 1.0;
-  actor.add(body);
-  const head = new THREE.Mesh(new THREE.SphereGeometry(0.115, 10, 8), outfit);
-  head.position.y = 1.65;
-  actor.add(head);
-  for (const sign of [-1, 1]) {
-    const leg = new THREE.Mesh(
-      new THREE.CapsuleGeometry(0.075, 0.65, 3, 6),
-      outfit,
-    );
-    leg.position.set(sign * 0.11, 0.38, 0);
-    actor.add(leg);
-  }
+  // Stage scale reference: open-source human character ensemble in dramatic stage blocking.
+  const actor = buildStageActors(STAGE);
   architecture.add(actor);
   // Chairs: shared geometry and materials, separate instance per seat component.
   const seatMat = new THREE.MeshStandardMaterial({
