@@ -1,4 +1,5 @@
 node_modules/
+.cdn-assets/
 dist-h5/
 .swc/
 .DS_Store

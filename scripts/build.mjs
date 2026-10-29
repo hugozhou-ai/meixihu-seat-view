@@ -1,6 +1,6 @@
 import { execSync } from "node:child_process";
 import { existsSync } from "node:fs";
-import { mkdir, cp } from "node:fs/promises";
+import { mkdir, cp, rm } from "node:fs/promises";
 
 for (const script of [
   "node_modules/@tarojs/binding/postinstall.js",
@@ -12,13 +12,12 @@ for (const script of [
 }
 
 execSync("node scripts/generate-icons.mjs", { stdio: "inherit" });
+// Each target owns its output; remove previous mixed builds and source maps.
+await rm("dist", { recursive: true, force: true });
+await rm("dist-h5", { recursive: true, force: true });
 execSync("npx taro build --type weapp", { stdio: "inherit" });
 execSync("npx taro build --type h5", { stdio: "inherit" });
 execSync("node scripts/generate-icons.mjs", { stdio: "inherit" });
-
-for (const item of ["index.html", "js", "css", "chunk"]) {
-  await cp(`dist-h5/${item}`, `dist/${item}`, { recursive: true });
-}
 
 for (const dir of ["dist", "dist-h5"]) {
   await mkdir(`${dir}/vendor`, { recursive: true });
@@ -34,6 +33,6 @@ console.log(
     build: "complete",
     weappOutput: "dist",
     h5Output: "dist-h5",
-    githubPagesRoot: "dist",
+    githubPagesRoot: "dist-h5",
   }),
 );

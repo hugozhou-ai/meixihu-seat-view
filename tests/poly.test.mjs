@@ -1,9 +1,15 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import * as THREE from "three";
+import { readFile } from "node:fs/promises";
+import { loadStageActors } from "../src/stage-actors.js";
 import { makePolyLayout, POLY_ROWS } from "../src/poly-layout.js";
 import { seatEye } from "../src/layout.js";
 import { buildPolyTheatre } from "../src/poly-theatre.js";
+await loadStageActors(async () => {
+  const bytes = await readFile(new URL("../public/models/stage-actors.bin", import.meta.url));
+  return bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength);
+});
 const seats = makePolyLayout();
 test("Shenzhen published row counts, boxes and pit sum to 1551 independent locations", () => {
   assert.equal(seats.length, 1551);

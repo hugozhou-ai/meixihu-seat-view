@@ -1,10 +1,16 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import * as THREE from "three";
+import { readFile } from "node:fs/promises";
 import { stageViewpoints, stageViewEye } from "../src/stage-view.js";
-import { STAGE_ACTORS, buildStageActors } from "../src/stage-actors.js";
+import { STAGE_ACTORS, buildStageActors, loadStageActors } from "../src/stage-actors.js";
 import { STAGE } from "../src/layout.js";
 import { POLY_STAGE } from "../src/poly-layout.js";
+
+await loadStageActors(async () => {
+  const bytes = await readFile(new URL("../public/models/stage-actors.bin", import.meta.url));
+  return bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength);
+});
 
 for (const [name, stage] of [
   ["meixihu", STAGE],

@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, Image, Picker } from "@tarojs/components";
+import { View, Text, Image, Picker, ScrollView } from "@tarojs/components";
 import { iconDataUri } from "../icons.js";
 
 const isWeapp = process.env.TARO_ENV === "weapp";
@@ -51,6 +51,7 @@ export function SegmentedTabs({
             aria-checked={active}
             className={`taro-tab-item ${active ? "active" : ""}`.trim()}
             onClick={() => {
+              console.info("[THEATRE_VIEW]", JSON.stringify({ event: "tab-selected", group: ariaLabel, value: opt.value, active }));
               if (!active && onChange) onChange(opt.value);
             }}
           >
@@ -176,7 +177,9 @@ export function ModalDialog({
             <LucideIcon name="x" size={18} color="#53644f" />
           </View>
         </View>
-        <View className="taro-modal-body">{children}</View>
+        {isWeapp ? <ScrollView scrollY className="taro-modal-body" enhanced>
+          <View className="mini-modal-content">{children}</View>
+        </ScrollView> : <View className="taro-modal-body h5-modal-body">{children}</View>}
       </View>
     </View>
   );

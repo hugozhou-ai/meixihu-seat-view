@@ -5,6 +5,8 @@ import * as THREE from "three";
 import { GLTFExporter } from "three/examples/jsm/exporters/GLTFExporter.js";
 import { seatEye, labelSeat, rowsFor } from "../../layout.js";
 import { stageViewpoints, stageViewEye } from "../../stage-view.js";
+import { loadStageActors } from "../../stage-actors.js";
+import { assetUrl, stageActorDataUrl } from "../../assets.js";
 import { VENUES, getVenue } from "../../venues.js";
 import {
   LucideIcon,
@@ -13,6 +15,21 @@ import {
   ModalDialog,
 } from "../../components/ui.jsx";
 import { SeatMapCanvas } from "../../components/SeatMapCanvas.jsx";
+import { MiniControls } from "../../components/MiniControls.jsx";
+import { beginGesture, moveGesture, finishGesture, viewportPoint, canvasTouches } from "../../viewport-gestures.js";
+
+function readMiniWindow() {
+  const info = Taro.getWindowInfo();
+  const menu = Taro.getMenuButtonBoundingClientRect();
+  return {
+    width: info.windowWidth, height: info.windowHeight,
+    left: info.safeArea.left,
+    right: Math.max(0, info.windowWidth - info.safeArea.right),
+    bottom: Math.max(0, info.windowHeight - info.safeArea.bottom),
+    header: Math.max(48, menu.bottom + 8),
+    menuLeft: menu.left,
+  };
+}
 
 const DEFAULT_FOV = 75;
 const ZONE_LABELS = {
@@ -52,8 +69,20 @@ function logEvent(event, data = {}) {
   console.info("[THEATRE_VIEW]", JSON.stringify({ event, ...data }));
 }
 
+async function requestAssetBuffer(url) {
+  if (process.env.TARO_ENV === "weapp") {
+    const response = await Taro.request({ url, responseType: "arraybuffer", timeout: 30000 });
+    if (response.statusCode !== 200) throw new Error(`舞台人物资源请求失败：HTTP ${response.statusCode}`);
+    return response.data;
+  }
+  const response = await fetch(url);
+  if (!response.ok) throw new Error(`舞台人物资源请求失败：HTTP ${response.status}`);
+  return response.arrayBuffer();
+}
+
 export default function IndexPage() {
   const isWeapp = process.env.TARO_ENV === "weapp";
+  const [miniWindow, setMiniWindow] = useState(() => isWeapp ? readMiniWindow() : null);
   const initialParams = useMemo(() => getInitialQueryParams(), []);
   const initialVenueId = useMemo(() => {
     const candidate = initialParams.theatre || "meixihu";
@@ -115,6 +144,7 @@ export default function IndexPage() {
   const [activeRefFile, setActiveRefFile] = useState(
     () => venue.references[0]?.file || "",
   );
+  const modalOpen = settingsOpen || referenceOpen || infoOpen || mapOpen;
   const [exportStatus, setExportStatus] = useState("");
   const [exportingGlb, setExportingGlb] = useState(false);
 
@@ -152,7 +182,8 @@ export default function IndexPage() {
     lastRenderMs: 0,
     errors: [],
     drag: null,
-    pinchDist: 0,
+    touchGesture: null,
+    viewportRect: null,
     venue,
     seats,
     seatById,
@@ -186,6 +217,7 @@ export default function IndexPage() {
     pitVisible,
     actorVisible,
     ready,
+    modalOpen: isWeapp && modalOpen,
   });
 
   const viewportHostRef = useRef(null);
@@ -415,8 +447,14 @@ export default function IndexPage() {
   }, [applyOrbitCamera]);
 
   const handleVenueChange = useCallback(
-    (nextId) => {
+    async (nextId) => {
       if (nextId === venueId) return;
+      try {
+        await loadStageActors(requestAssetBuffer, stageActorDataUrl(process.env.TARO_ENV));
+      } catch (error) {
+        showToast(`剧场加载失败：${error.message}`);
+        return;
+      }
       const nextVenue = getVenue(nextId);
       const nextSeats = nextVenue.makeLayout();
       const nextSeatById = new Map(
@@ -769,6 +807,7 @@ export default function IndexPage() {
           }
         }
 
+        if (eng.modalOpen) return;
         const t0 = Date.now();
         renderer.render(scene, camera);
         eng.lastRenderMs = Date.now() - t0;
@@ -803,14 +842,15 @@ export default function IndexPage() {
         const query = Taro.createSelectorQuery();
         query
           .select("#theatre-webgl")
-          .fields({ node: true, size: true })
-          .exec((res) => {
+          .fields({ node: true, size: true, rect: true })
+          .exec(async (res) => {
             if (disposed) return;
             const item = res?.[0];
             if (!item || !item.node) {
               setLoadError("当前小程序环境未能获取 WebGL 画布节点");
               return;
             }
+            engineRef.current.viewportRect = item;
             const canvas = item.node;
             const sys = Taro.getSystemInfoSync();
             const width = item.width || sys.windowWidth || 375;
@@ -826,6 +866,8 @@ export default function IndexPage() {
             if (!canvas.removeEventListener) canvas.removeEventListener = () => {};
 
             try {
+              await loadStageActors(requestAssetBuffer, stageActorDataUrl(process.env.TARO_ENV));
+              if (disposed) return;
               const gl =
                 canvas.getContext("webgl", {
                   antialias: true,
@@ -835,6 +877,11 @@ export default function IndexPage() {
                   antialias: true,
                   preserveDrawingBuffer: true,
                 });
+              logEvent("renderer-context", {
+                target: "weapp",
+                three: THREE.REVISION,
+                webgl: gl?.getParameter(gl.VERSION),
+              });
               const renderer = new THREE.WebGLRenderer({
                 canvas,
                 context: gl,
@@ -853,6 +900,7 @@ export default function IndexPage() {
               );
             } catch (err) {
               const msg = err?.message || String(err);
+              logEvent("renderer-init-failed", { target: "weapp", three: THREE.REVISION, message: msg });
               engineRef.current.errors.push({
                 event: "renderer-init-failed",
                 message: msg,
@@ -869,7 +917,7 @@ export default function IndexPage() {
       };
     } else {
       // H5 initialization: full-screen immersive view
-      const timer = setTimeout(() => {
+      const timer = setTimeout(async () => {
         if (disposed) return;
         const container =
           document.getElementById("viewport") || viewportHostRef.current;
@@ -887,6 +935,8 @@ export default function IndexPage() {
           720;
 
         try {
+          await loadStageActors(requestAssetBuffer, stageActorDataUrl(process.env.TARO_ENV));
+          if (disposed) return;
           const renderer = new THREE.WebGLRenderer({
             antialias: true,
             powerPreference: "high-performance",
@@ -935,6 +985,7 @@ export default function IndexPage() {
           }
         } catch (err) {
           const msg = err?.message || String(err);
+          logEvent("renderer-init-failed", { target: "h5", three: THREE.REVISION, message: msg });
           engineRef.current.errors.push({
             event: "renderer-init-failed",
             message: msg,
@@ -953,13 +1004,42 @@ export default function IndexPage() {
     }
   }, []);
 
+  useEffect(() => {
+    if (!isWeapp) return;
+    const onResize = () => setMiniWindow(readMiniWindow());
+    Taro.onWindowResize(onResize);
+    return () => Taro.offWindowResize(onResize);
+  }, [isWeapp]);
+
+  useEffect(() => {
+    if (!isWeapp || modalOpen) return;
+    let disposed = false;
+    Taro.nextTick(() => {
+      Taro.createSelectorQuery().select("#theatre-webgl")
+        .fields({ node: true, size: true, rect: true }).exec(res => {
+          if (disposed) return;
+          const rect = res?.[0];
+          const eng = engineRef.current;
+          if (!rect?.width || !rect?.height || !eng.renderer) return;
+          eng.viewportRect = rect;
+          eng.width = rect.width;
+          eng.height = rect.height;
+          eng.camera.aspect = rect.width / rect.height;
+          eng.camera.updateProjectionMatrix();
+          eng.renderer.setSize(rect.width, rect.height, false);
+          logEvent("viewport-resized", { width: rect.width, height: rect.height, left: rect.left, top: rect.top, panelCollapsed });
+        });
+    });
+    return () => { disposed = true; };
+  }, [isWeapp, miniWindow, panelCollapsed, modalOpen, ready]);
+
   // Touch & Mouse Pointer Interaction on 3D Viewport
   const raycastChairAt = useCallback(
     (clientX, clientY) => {
       const eng = engineRef.current;
       if (!eng.camera || !eng.theatre || eng.mode !== "overview") return;
-      let rectLeft = 0;
-      let rectTop = 0;
+      let rectLeft = eng.viewportRect?.left || 0;
+      let rectTop = eng.viewportRect?.top || 0;
       let rectWidth = eng.width;
       let rectHeight = eng.height;
       if (!isWeapp && eng.renderer?.domElement?.getBoundingClientRect) {
@@ -969,8 +1049,9 @@ export default function IndexPage() {
         rectWidth = r.width || eng.width;
         rectHeight = r.height || eng.height;
       }
-      const nx = ((clientX - rectLeft) / Math.max(1, rectWidth)) * 2 - 1;
-      const ny = -((clientY - rectTop) / Math.max(1, rectHeight)) * 2 + 1;
+      const { x: nx, y: ny } = viewportPoint(clientX, clientY, {
+        left: rectLeft, top: rectTop, width: rectWidth, height: rectHeight,
+      });
       const raycaster = new THREE.Raycaster();
       raycaster.setFromCamera(new THREE.Vector2(nx, ny), eng.camera);
       const occluders = [];
@@ -991,25 +1072,14 @@ export default function IndexPage() {
     [goToSeat, isWeapp],
   );
 
+  const viewportTouches = touches => isWeapp
+    ? canvasTouches(touches || [], engineRef.current.viewportRect)
+    : (touches || []);
+
   const handleViewportTouchStart = (e) => {
-    const touches = e.touches || [];
     const eng = engineRef.current;
-    if (touches.length === 2 && eng.mode === "overview") {
-      const dx =
-        (touches[0].clientX ?? touches[0].x) -
-        (touches[1].clientX ?? touches[1].x);
-      const dy =
-        (touches[0].clientY ?? touches[0].y) -
-        (touches[1].clientY ?? touches[1].y);
-      eng.pinchDist = Math.hypot(dx, dy);
-      eng.drag = null;
-      return;
-    }
-    const t = touches[0];
-    if (!t) return;
-    const x = t.clientX ?? t.pageX ?? t.x ?? 0;
-    const y = t.clientY ?? t.pageY ?? t.y ?? 0;
-    eng.drag = { x, y, startX: x, startY: y, moved: false };
+    if (!eng.ready) return;
+    eng.touchGesture = beginGesture(viewportTouches(e.touches));
     if (eng.mode !== "overview") {
       eng.transition = null;
       syncAnglesFromCamera();
@@ -1017,68 +1087,37 @@ export default function IndexPage() {
   };
 
   const handleViewportTouchMove = (e) => {
-    const touches = e.touches || [];
     const eng = engineRef.current;
-    if (touches.length === 2 && eng.mode === "overview") {
-      const dx =
-        (touches[0].clientX ?? touches[0].x) -
-        (touches[1].clientX ?? touches[1].x);
-      const dy =
-        (touches[0].clientY ?? touches[0].y) -
-        (touches[1].clientY ?? touches[1].y);
-      const dist = Math.hypot(dx, dy);
-      if (eng.pinchDist > 0) {
-        const delta = eng.pinchDist - dist;
-        eng.orbitRadius = THREE.MathUtils.clamp(
-          eng.orbitRadius + delta * 0.12,
-          13,
-          85,
-        );
+    if (!eng.touchGesture) return;
+    const motion = moveGesture(eng.touchGesture, viewportTouches(e.touches));
+    if (!motion) return;
+    if (motion.kind === "pinch") {
+      if (eng.mode === "overview") {
+        eng.orbitRadius = THREE.MathUtils.clamp(eng.orbitRadius / motion.scale, 13, 85);
         applyOrbitCamera();
       }
-      eng.pinchDist = dist;
-      return;
-    }
-    if (!eng.drag || !touches[0]) return;
-    const t = touches[0];
-    const x = t.clientX ?? t.pageX ?? t.x ?? 0;
-    const y = t.clientY ?? t.pageY ?? t.y ?? 0;
-    const dx = x - eng.drag.x;
-    const dy = y - eng.drag.y;
-    if (Math.hypot(x - eng.drag.startX, y - eng.drag.startY) > 4) {
-      eng.drag.moved = true;
-    }
-    if (eng.mode === "overview") {
-      eng.orbitTheta -= dx * 0.0055;
-      eng.orbitPhi = THREE.MathUtils.clamp(
-        eng.orbitPhi - dy * 0.005,
-        0.13,
-        Math.PI * 0.48,
-      );
+    } else if (eng.mode === "overview") {
+      eng.orbitTheta -= motion.dx * 0.0055;
+      eng.orbitPhi = THREE.MathUtils.clamp(eng.orbitPhi - motion.dy * 0.005, 0.13, Math.PI * 0.48);
       applyOrbitCamera();
     } else {
-      eng.yaw -= dx * 0.0038;
-      eng.pitch = THREE.MathUtils.clamp(eng.pitch - dy * 0.0033, -1.3, 1.3);
+      eng.yaw -= motion.dx * 0.0038;
+      eng.pitch = THREE.MathUtils.clamp(eng.pitch - motion.dy * 0.0033, -1.3, 1.3);
       applyCameraAngles();
     }
-    eng.drag.x = x;
-    eng.drag.y = y;
   };
 
   const handleViewportTouchEnd = (e) => {
     const eng = engineRef.current;
-    eng.pinchDist = 0;
-    if (!eng.drag) return;
-    const t = e.changedTouches?.[0] || e.touches?.[0];
-    const endX = t ? (t.clientX ?? t.pageX ?? t.x ?? eng.drag.x) : eng.drag.x;
-    const endY = t ? (t.clientY ?? t.pageY ?? t.y ?? eng.drag.y) : eng.drag.y;
-    const moved =
-      eng.drag.moved ||
-      Math.hypot(endX - eng.drag.startX, endY - eng.drag.startY) > 5;
-    eng.drag = null;
-    if (!moved && eng.mode === "overview") {
-      raycastChairAt(endX, endY);
-    }
+    if (!eng.touchGesture) return;
+    if (e.touches?.length) return;
+    const tap = finishGesture(eng.touchGesture, viewportTouches(e.changedTouches));
+    eng.touchGesture = null;
+    if (tap && eng.mode === "overview") raycastChairAt(tap.x, tap.y);
+  };
+
+  const handleViewportTouchCancel = () => {
+    engineRef.current.touchGesture = null;
   };
 
   const handleMouseDown = (e) => {
@@ -1464,12 +1503,17 @@ export default function IndexPage() {
   const onStage = perspective === "stage";
   const isBoxZone = zoneValue.startsWith("B");
   const referenceImgUrl = activeReference
-    ? `./reference/${activeReference.file}`
+    ? assetUrl(`reference/${activeReference.file}`)
     : "";
 
   return (
     <View
       id="app"
+      style={isWeapp ? {
+        "--safe-left": `${miniWindow.left}px`, "--safe-right": `${miniWindow.right}px`,
+        "--safe-bottom": `${miniWindow.bottom}px`, "--header-height": `${miniWindow.header}px`,
+        "--menu-left": `${miniWindow.menuLeft}px`, "--panel-width": panelCollapsed ? "0px" : "248px",
+      } : undefined}
       className={`app-shell ${panelCollapsed ? "panel-collapsed" : ""} ${isWeapp ? "mini-layout" : ""}`.trim()}
     >
       {/* 3D Viewport */}
@@ -1478,9 +1522,10 @@ export default function IndexPage() {
         ref={viewportHostRef}
         className="viewport-container"
         aria-label="主剧场三维视图"
-        onTouchStart={handleViewportTouchStart}
-        onTouchMove={handleViewportTouchMove}
-        onTouchEnd={handleViewportTouchEnd}
+        onTouchStart={isWeapp ? undefined : handleViewportTouchStart}
+        onTouchMove={isWeapp ? undefined : handleViewportTouchMove}
+        onTouchEnd={isWeapp ? undefined : handleViewportTouchEnd}
+        onTouchCancel={handleViewportTouchCancel}
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
@@ -1492,6 +1537,11 @@ export default function IndexPage() {
             id="theatre-webgl"
             canvasId="theatre-webgl"
             className="webgl-canvas"
+            style={{ display: modalOpen || loadError ? "none" : "block" }}
+            onTouchStart={handleViewportTouchStart}
+            onTouchMove={handleViewportTouchMove}
+            onTouchEnd={handleViewportTouchEnd}
+            onTouchCancel={handleViewportTouchCancel}
             disableScroll
           />
         ) : null}
@@ -1500,7 +1550,7 @@ export default function IndexPage() {
           <View id="loading" className="loading-overlay">
             {loadError ? (
               <>
-                <Text className="loading-title">当前设备无法启动三维渲染</Text>
+                <Text className="loading-title">剧场加载失败</Text>
                 <Text className="loading-sub">{loadError}</Text>
               </>
             ) : (
@@ -1514,6 +1564,24 @@ export default function IndexPage() {
         ) : null}
       </View>
 
+      {isWeapp ? <MiniControls
+        venues={VENUES} venueId={venueId} onVenueChange={handleVenueChange}
+        panelCollapsed={panelCollapsed} togglePanel={() => setPanelCollapsed(v => !v)}
+        perspective={perspective} mode={mode}
+        onPerspectiveChange={v => v === "stage" ? goToStage(stagePoint) : goToSeat(selectedSeat)}
+        onModeChange={v => v === "overview" ? setOverview() : perspective === "stage" ? goToStage(stagePoint) : goToSeat(selectedSeat)}
+        floor={floor} onFloorChange={handleFloorChange} floorCount={currentFloorCount}
+        zoneOptions={availableZones} rowOptions={availableRows} numberOptions={availableNumbers}
+        zone={zoneValue} row={rowValue} number={numberValue}
+        onZoneChange={handleZoneChange} onRowChange={handleRowChange} onNumberChange={v => setNumberValue(Number(v))}
+        onGoSeat={handleGoSeat} stagePoints={stagePoints} stagePoint={stagePoint}
+        onStageChange={id => goToStage(stagePoints.find(p => p.id === id))}
+        onOpenMap={() => setMapOpen(true)} onMoveSeat={moveSeat}
+        cardTitle={cardTitle} cardDistance={cardDistance} ready={ready}
+        onReset={restoreNaturalView} onLookBack={handleLookBack} onLighting={handleLightingToggle}
+        lighting={lighting} onSettings={() => setSettingsOpen(true)}
+        onReference={() => setReferenceOpen(true)} onInfo={() => setInfoOpen(true)} toast={toastMsg}
+      /> : <>
       {/* Top Navigation Bar */}
       <View className="topbar">
         <View
@@ -1935,6 +2003,8 @@ export default function IndexPage() {
         <Text>{toastMsg}</Text>
       </View>
 
+      </>}
+
       {/* Settings Dialog */}
       <ModalDialog
         id="settings-dialog"
@@ -2105,7 +2175,7 @@ export default function IndexPage() {
                 if (isWeapp && Taro.previewImage) {
                   Taro.previewImage({
                     current: referenceImgUrl,
-                    urls: venue.references.map((r) => `./reference/${r.file}`),
+                    urls: venue.references.map((r) => assetUrl(`reference/${r.file}`)),
                   });
                 }
               }}
@@ -2217,7 +2287,7 @@ export default function IndexPage() {
         open={mapOpen}
         onClose={() => setMapOpen(false)}
         eyebrow="CHOOSE A SEAT"
-        title={`${currentFloorMeta?.label} · 点击入座`}
+        title={`${currentFloorMeta?.label} · ${isWeapp ? "轻点入座，双指放大" : "点击入座"}`}
         className="map-dialog"
       >
         <View id="expanded-seatmap" className="expanded-seatmap-box">
@@ -2235,7 +2305,7 @@ export default function IndexPage() {
             }}
           />
         </View>
-        <Text className="dialog-p">点击任意圆点入座。当前标注为重建编号。</Text>
+        <Text className="dialog-p">{isWeapp ? "双指缩放，单指拖动定位，轻点座位入座。" : "点击任意圆点入座。"}当前标注为重建编号。</Text>
       </ModalDialog>
     </View>
   );

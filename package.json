@@ -10,11 +10,14 @@
     "css": "none"
   },
   "scripts": {
-    "prebuild": "node scripts/generate-icons.mjs",
-    "build:weapp": "node scripts/generate-icons.mjs && taro build --type weapp",
-    "dev:weapp": "node scripts/generate-icons.mjs && taro build --type weapp --watch",
-    "build:h5": "node scripts/generate-icons.mjs && taro build --type h5",
-    "dev:h5": "node scripts/generate-icons.mjs && taro build --type h5 --watch",
+    "assets:prepare": "node scripts/prepare-cdn-assets.mjs",
+    "assets:check": "node scripts/prepare-cdn-assets.mjs --check",
+    "assets:publish": "node scripts/prepare-cdn-assets.mjs && node scripts/publish-cdn-assets.mjs",
+    "prebuild": "npm run assets:check && node scripts/generate-icons.mjs",
+    "build:weapp": "npm run assets:check && node scripts/generate-icons.mjs && taro build --type weapp",
+    "dev:weapp": "npm run assets:check && node scripts/generate-icons.mjs && taro build --type weapp --watch",
+    "build:h5": "npm run assets:check && node scripts/generate-icons.mjs && taro build --type h5",
+    "dev:h5": "npm run assets:check && node scripts/generate-icons.mjs && taro build --type h5 --watch",
     "build": "node scripts/build.mjs",
     "test": "node --test tests/*.test.mjs",
     "dev": "node scripts/serve.mjs"
@@ -32,7 +35,7 @@
     "@tarojs/taro": "4.3.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "three": "0.180.0"
+    "three": "0.162.0"
   },
   "devDependencies": {
     "@babel/core": "^7.26.0",

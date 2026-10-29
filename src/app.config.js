@@ -6,6 +6,7 @@ export default {
     navigationBarTitleText: "剧场座位视角 · Theatre Seat View",
     navigationBarTextStyle: "white",
     navigationStyle: "custom",
+    pageOrientation: "landscape",
     backgroundColor: "#171914",
   },
 };

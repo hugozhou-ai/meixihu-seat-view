@@ -57,7 +57,7 @@ const faviconSource = await readFile(
 );
 const faviconSvg = faviconSource.replace('stroke="currentColor"', 'stroke="#d5c29d"');
 
-for (const dir of ["dist", "dist-h5"]) {
+for (const dir of ["dist-h5"]) {
   if (existsSync(dir)) {
     await mkdir(dir, { recursive: true });
     await writeFile(`${dir}/icons.svg`, spriteSvg);

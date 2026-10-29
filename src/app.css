@@ -173,7 +173,9 @@ taro-image-core {
   z-index: 10;
 }
 
-.topbar > * {
+.topbar > .brand,
+.topbar > .header-center,
+.topbar > .header-actions {
   pointer-events: auto;
 }
 
@@ -829,8 +831,8 @@ taro-image-core {
   cursor: pointer;
 }
 
+.h5-modal-body { padding: 6px 18px 18px; }
 .taro-modal-body {
-  padding: 6px 18px 18px;
   overflow-y: auto;
 }
 
@@ -999,174 +1001,6 @@ taro-image-core {
   color: #4a7054;
 }
 
-/* WeChat Mini Program Layout (.mini-layout or mobile screen <= 760px) */
-.app-shell.mini-layout .topbar {
-  top: 40px;
-  height: 54px;
-  padding: 8px 96px 8px 14px;
-}
-
-.app-shell.mini-layout .header-center {
-  display: none;
-}
-
-.app-shell.mini-layout .brand-title {
-  font-size: 14px;
-  letter-spacing: 1px;
-}
-
-.app-shell.mini-layout .brand-sub {
-  font-size: 7px;
-}
-
-.app-shell.mini-layout .action-btn {
-  padding: 6px 9px;
-  font-size: 10px;
-}
-
-.app-shell.mini-layout .icon-circle-btn {
-  width: 26px;
-  height: 26px;
-}
-
-.app-shell.mini-layout .view-tabs {
-  top: 96px;
-  left: 50%;
-  padding: 3px;
-}
-
-.app-shell.mini-layout .view-tabs .taro-tab-item {
-  font-size: 10px;
-  padding: 6px 12px;
-}
-
-.app-shell.mini-layout .seat-panel {
-  top: auto;
-  bottom: 28px;
-  left: 10px;
-  width: calc(100% - 20px);
-  padding: 12px 14px 10px;
-  border-radius: 14px;
-  max-height: 49%;
-}
-
-.app-shell.mini-layout .panel-title .eyebrow,
-.app-shell.mini-layout .panel-desc,
-.app-shell.mini-layout .map-legend,
-.app-shell.mini-layout .panel-footer {
-  display: none;
-}
-
-.app-shell.mini-layout .venue-picker {
-  margin-bottom: 6px;
-}
-
-.app-shell.mini-layout .panel-heading-row {
-  margin: 4px 0 6px;
-}
-
-.app-shell.mini-layout .panel-h1 {
-  font-size: 15px;
-}
-
-.app-shell.mini-layout .perspective-tabs {
-  margin-bottom: 8px;
-}
-
-.app-shell.mini-layout .taro-tab-item {
-  padding: 6px 4px;
-  font-size: 11px;
-}
-
-.app-shell.mini-layout .map-heading {
-  margin-top: 8px;
-}
-
-.app-shell.mini-layout .audience-middle-grid {
-  display: grid;
-  grid-template-columns: 54% 44%;
-  justify-content: space-between;
-  align-items: center;
-  margin: 4px 0 8px;
-}
-
-.app-shell.mini-layout .seatmap-wrapper {
-  height: 132px;
-}
-
-.app-shell.mini-layout .seat-form {
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
-
-.app-shell.mini-layout .primary-btn {
-  padding: 9px 12px;
-  font-size: 11px;
-}
-
-.app-shell.mini-layout .numbering-note {
-  font-size: 8px;
-  margin: 6px 0 0;
-}
-
-.app-shell.mini-layout .seat-card {
-  left: 14px;
-  bottom: calc(49% + 36px);
-  min-width: 0;
-}
-
-.app-shell.mini-layout.panel-collapsed .seat-card {
-  bottom: 140px;
-}
-
-.app-shell.mini-layout .seat-card-h2 {
-  font-size: 16px;
-  margin: 4px 0 6px;
-}
-
-.app-shell.mini-layout .seat-id {
-  display: none;
-}
-
-.app-shell.mini-layout .viewer-tools {
-  bottom: calc(49% + 36px);
-  right: 12px;
-  gap: 6px;
-}
-
-.app-shell.mini-layout.panel-collapsed .viewer-tools {
-  bottom: 140px;
-}
-
-.app-shell.mini-layout .tool-button {
-  width: 32px;
-  height: 32px;
-}
-
-.app-shell.mini-layout .viewer-hint {
-  bottom: 24px;
-  left: 50%;
-  font-size: 8px;
-}
-
-.app-shell.mini-layout .bottom-bar {
-  height: 22px;
-  padding: 0 12px;
-  font-size: 8px;
-}
-
-.app-shell.mini-layout .render-status-text {
-  display: none;
-}
-
-.app-shell.mini-layout .toast-banner {
-  left: 50%;
-  top: 136px;
-  font-size: 10px;
-}
-
 @media (max-width: 760px) {
   .topbar {
     height: 70px;
@@ -1264,4 +1098,154 @@ taro-image-core {
     top: 128px;
     font-size: 10px;
   }
+}
+
+/* Native landscape controls occupy their own space outside the WebGL canvas. */
+.app-shell.mini-layout .viewport-container {
+  left: calc(var(--safe-left) + var(--panel-width) + 8px);
+  top: var(--header-height);
+  right: calc(var(--safe-right) + 8px);
+  bottom: calc(var(--safe-bottom) + 92px);
+  width: auto;
+  height: auto;
+}
+.app-shell.mini-layout .viewport-container::after { display: none; }
+.mini-header {
+  position: absolute;
+  top: 0;
+  left: var(--safe-left);
+  right: var(--safe-right);
+  height: var(--header-height);
+}
+.mini-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 100%;
+  padding-left: 16px;
+  font-size: 15px;
+  color: #d5c29d;
+}
+.mini-mode-tabs {
+  position: absolute;
+  left: calc(var(--panel-width) + 8px);
+  bottom: 4px;
+  background: #252d26;
+  border-radius: 10px;
+  padding: 2px;
+}
+.mini-mode-tabs .taro-tab-item { min-width: 86px; }
+.mini-header-actions {
+  position: absolute;
+  right: calc(100vw - var(--safe-right) - var(--menu-left) + 8px);
+  bottom: 4px;
+  display: flex;
+  gap: 4px;
+}
+.mini-seat-panel {
+  position: absolute;
+  left: calc(var(--safe-left) + 8px);
+  top: var(--header-height);
+  bottom: calc(var(--safe-bottom) + 8px);
+  width: 240px;
+  height: calc(100% - var(--header-height) - var(--safe-bottom) - 8px);
+  background: #f1efe7;
+  color: #24332d;
+  border-radius: 12px;
+}
+.mini-panel-content { padding: 10px; }
+.mini-layout .taro-select-trigger {
+  min-height: 44px;
+  padding: 0 8px;
+  font-size: 12px;
+}
+.mini-layout .taro-select-value { font-size: 12px; }
+.mini-layout .taro-select-label { margin-bottom: 4px; font-size: 11px; }
+.mini-venue .taro-select-label { display: none; }
+.mini-layout .taro-tab-item {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 8px;
+  font-size: 12px;
+}
+.mini-perspective-tabs, .mini-floor-tabs { margin-top: 8px; }
+.mini-perspective-tabs .taro-tab-item,
+.mini-floor-tabs .taro-tab-item { flex: 1; }
+.mini-seat-form {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 1fr;
+  gap: 6px;
+  margin: 10px 0;
+}
+.mini-go-seat {
+  display: flex;
+  min-height: 44px;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  border-radius: 8px;
+}
+.mini-go-seat { background: #2b5342; color: #eff5e8; }
+.mini-section-label { display: block; margin: 14px 0 8px; font-size: 12px; }
+.mini-stage-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.mini-panel-note { display: block; margin-top: 10px; font-size: 10px; color: #7e8677; }
+.mini-view-footer {
+  position: absolute;
+  left: calc(var(--safe-left) + var(--panel-width) + 8px);
+  right: calc(var(--safe-right) + 8px);
+  bottom: calc(var(--safe-bottom) + 4px);
+  height: 84px;
+}
+.mini-view-status {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  height: 34px;
+  font-size: 10px;
+  color: #aeb8a5;
+}
+.mini-view-status #selected-label { font-size: 13px; color: #eee9df; white-space: nowrap; }
+.mini-view-tools { display: flex; justify-content: space-between; gap: 4px; }
+.mini-tool {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  min-width: 44px;
+  height: 44px;
+  padding: 3px;
+  border-radius: 8px;
+  font-size: 10px;
+  background: #252d26;
+  color: #eee9df;
+}
+.mini-tool.active { background: #3c5241; }
+.mini-layout .taro-modal-overlay {
+  padding: 8px calc(var(--safe-right) + 8px) calc(var(--safe-bottom) + 8px) calc(var(--safe-left) + 8px);
+}
+.mini-layout .taro-modal-card { max-height: 100%; }
+.mini-layout .taro-modal-card.small-dialog { max-width: 560px; }
+.mini-layout .taro-modal-header { padding: 4px 12px; flex-shrink: 0; min-height: 48px; }
+.mini-layout .taro-modal-close { min-width: 44px; height: 44px; }
+.mini-layout .taro-modal-body { flex: 1; min-height: 0; }
+.mini-modal-content { padding: 8px 16px 16px; }
+.mini-layout .seatmap-wrapper.expanded { height: calc(100vh - 200px - var(--safe-bottom)); min-height: 120px; max-height: 220px; }
+.mini-layout .reference-image { max-height: 50vh; }
+
+.mini-seat-form .taro-select-trigger { padding: 0 6px; gap: 2px; }
+
+.mini-map-tools { display: flex; align-items: center; justify-content: center; gap: 8px; margin: 4px 0; }
+.mini-map-tool { width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; border-radius: 8px; background: #e1e5d7; }
+.mini-map-scale { min-width: 48px; text-align: center; font-size: 12px; color: #53644f; }
+@media (max-width: 660px) {
+  .mini-layout .mini-brand { display: none; }
+  .mini-layout .mini-mode-tabs { left: 8px; }
+  .mini-layout #look-back, .mini-layout #seat-prev, .mini-layout #seat-next { display: none; }
+  .mini-view-status { gap: 4px; font-size: 9px; }
+  .mini-view-status #selected-label { font-size: 11px; }
 }

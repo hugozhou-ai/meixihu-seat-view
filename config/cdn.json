@@ -1,0 +1,6 @@
+{
+  "bucket": "tsh-public-resource",
+  "region": "us-east-1",
+  "prefix": "tutti/desktop/v2/production/public-resource/theatre-seat-view/",
+  "baseUrl": "https://d2pciwc1akv4l5.cloudfront.net/tutti/desktop/v2/production/public-resource/theatre-seat-view/"
+}

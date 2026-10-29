@@ -1,6 +1,7 @@
 import { defineConfig } from "@tarojs/cli";
 import devConfig from "./dev.js";
 import prodConfig from "./prod.js";
+import { CDN_ASSETS } from "../src/asset-manifest.js";
 
 const configureWebpackChain = (chain) => {
   chain.module
@@ -27,9 +28,12 @@ export default defineConfig(async (merge) => {
     plugins: ["@tarojs/plugin-framework-react"],
     defineConstants: {},
     copy: {
-      patterns: [
-        { from: "public/reference/", to: `${outRoot}/reference/` },
-      ],
+      patterns: isH5 ? [
+        {
+          from: "public/models/stage-actors.bin",
+          to: `${outRoot}/${CDN_ASSETS["models/stage-actors.bin"].path}`,
+        },
+      ] : [],
       options: {},
     },
     framework: "react",

@@ -37,7 +37,7 @@ jobs:
       - name: Upload static site
         uses: actions/upload-pages-artifact@v4
         with:
-          path: dist
+          path: dist-h5
 
   deploy:
     runs-on: ubuntu-latest

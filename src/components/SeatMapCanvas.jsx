@@ -1,6 +1,9 @@
-import React, { useEffect, useMemo, useRef } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import Taro from "@tarojs/taro";
-import { View, Canvas } from "@tarojs/components";
+import { View, Text, Canvas } from "@tarojs/components";
+import { beginGesture, moveGesture, finishGesture, canvasTouches, touchPoint } from "../viewport-gestures.js";
+import { mapTransform, clampMapView, zoomMapView, seatAtMapPoint } from "../seat-map-viewport.js";
+import { LucideIcon } from "./ui.jsx";
 import { labelSeat } from "../layout.js";
 
 export function computeSeatMapPoints(seats, floor, pit) {
@@ -28,18 +31,13 @@ export function computeSeatMapPoints(seats, floor, pit) {
   return { points, viewWidth: 320, viewHeight, radius };
 }
 
-function drawSeatMap2D(ctx, width, height, mapData, selectedSeatId) {
-  const { points, viewWidth, viewHeight, radius } = mapData;
+function drawSeatMap2D(ctx, width, height, mapData, selectedSeatId, view) {
+  const { points, radius } = mapData;
   ctx.clearRect(0, 0, width, height);
-  const scaleX = width / viewWidth;
-  const scaleY = height / viewHeight;
-  const s = Math.min(scaleX, scaleY);
-  const offsetX = (width - viewWidth * s) / 2;
-  const offsetY = (height - viewHeight * s) / 2;
-
+  const transform = mapTransform({ width, height }, mapData, view);
   ctx.save();
-  ctx.translate(offsetX, offsetY);
-  ctx.scale(s, s);
+  ctx.translate(transform.x, transform.y);
+  ctx.scale(transform.scale, transform.scale);
 
   // Stage trapezoid: M99 8H221L216 19H104Z
   ctx.beginPath();
@@ -92,91 +90,124 @@ export function SeatMapCanvas({
     () => computeSeatMapPoints(seats, floor, pit),
     [seats, floor, pit],
   );
-  const hostRef = useRef(null);
   const isWeapp = process.env.TARO_ENV === "weapp";
+  const canvasRef = useRef(null);
+  const viewRef = useRef({ zoom: 1, x: 0, y: 0 });
+  const gestureRef = useRef(null);
+  const [zoomPercent, setZoomPercent] = useState(100);
+  const redraw = () => {
+    const canvas = canvasRef.current;
+    if (canvas) drawSeatMap2D(canvas.ctx, canvas.width, canvas.height, mapData, selectedSeat?.seatId, viewRef.current);
+  };
+  useEffect(() => {
+    viewRef.current = { zoom: 1, x: 0, y: 0 };
+  }, [mapData]);
 
   useEffect(() => {
     if (!isWeapp) return;
-    const timer = setTimeout(() => {
+    let disposed = false;
+    const measure = () => {
       const query = Taro.createSelectorQuery();
       query
         .select(`#${canvasId}`)
-        .fields({ node: true, size: true })
+        .fields({ node: true, size: true, rect: true })
         .exec((res) => {
+          if (disposed) return;
           const item = res?.[0];
           if (!item || !item.node) return;
           const canvas = item.node;
           const ctx = canvas.getContext("2d");
-          const sys = Taro.getSystemInfoSync();
+          const sys = Taro.getWindowInfo();
           const dpr = Math.min(sys.pixelRatio || 2, 2.5);
-          const w = Math.max(160, item.width || 300);
-          const h = Math.max(120, item.height || 200);
+          const w = item.width;
+          const h = item.height;
+          if (!w || !h) return;
           canvas.width = w * dpr;
           canvas.height = h * dpr;
           ctx.scale(dpr, dpr);
-          drawSeatMap2D(ctx, w, h, mapData, selectedSeat?.seatId);
+          canvasRef.current = { ctx, width: w, height: h, left: item.left, top: item.top };
+          viewRef.current = clampMapView(viewRef.current, canvasRef.current, mapData);
+          redraw();
         });
-    }, 30);
-    return () => clearTimeout(timer);
+    };
+    const timer = setTimeout(measure, 30);
+    const onResize = () => Taro.nextTick(measure);
+    Taro.onWindowResize(onResize);
+    return () => {
+      disposed = true;
+      clearTimeout(timer);
+      Taro.offWindowResize(onResize);
+    };
   }, [isWeapp, canvasId, mapData, selectedSeat]);
 
-  const handleWeappTouchEnd = (e) => {
-    const touch = e.changedTouches?.[0] || e.touches?.[0];
-    if (!touch) return;
-    const query = Taro.createSelectorQuery();
-    query
-      .select(`#${canvasId}`)
-      .boundingClientRect((rect) => {
-        if (!rect || !rect.width || !rect.height) return;
-        const clientX = touch.clientX ?? touch.pageX ?? touch.x ?? 0;
-        const clientY = touch.clientY ?? touch.pageY ?? touch.y ?? 0;
-        const localX = clientX - rect.left;
-        const localY = clientY - rect.top;
+  const mapTouches = touches => canvasTouches(touches || [], canvasRef.current);
+  const handleWeappTouchStart = e => {
+    if (!canvasRef.current) return;
+    gestureRef.current = beginGesture(mapTouches(e.touches));
+  };
+  const handleWeappTouchMove = e => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const touches = mapTouches(e.touches);
+    const motion = moveGesture(gestureRef.current, touches);
+    if (!motion) return;
+    if (motion.kind === "pinch") {
+      const first = touchPoint(touches[0]);
+      const second = touchPoint(touches[1]);
+      const focus = { x: (first.x + second.x) / 2 - canvas.left, y: (first.y + second.y) / 2 - canvas.top };
+      viewRef.current = zoomMapView(viewRef.current, motion.scale, focus, canvas, mapData);
+    } else {
+      viewRef.current = clampMapView({ ...viewRef.current,
+        x: viewRef.current.x + motion.dx, y: viewRef.current.y + motion.dy,
+      }, canvas, mapData);
+    }
+    redraw();
+  };
+  const handleWeappTouchEnd = e => {
+    if (!canvasRef.current || e.touches?.length) return;
+    const tap = finishGesture(gestureRef.current, mapTouches(e.changedTouches));
+    gestureRef.current = null;
+    setZoomPercent(Math.round(viewRef.current.zoom * 100));
+    if (!tap) return;
+    const canvas = canvasRef.current;
+    const seat = seatAtMapPoint({ x: tap.x - canvas.left, y: tap.y - canvas.top }, canvas, mapData, viewRef.current);
+    if (seat) onSelectSeat?.(seat);
+  };
 
-        const { points, viewWidth, viewHeight } = mapData;
-        const s = Math.min(rect.width / viewWidth, rect.height / viewHeight);
-        const offsetX = (rect.width - viewWidth * s) / 2;
-        const offsetY = (rect.height - viewHeight * s) / 2;
-        const vx = (localX - offsetX) / s;
-        const vy = (localY - offsetY) / s;
-
-        let best = null;
-        let bestDist = 14;
-        for (const pt of points) {
-          const d = Math.hypot(pt.x - vx, pt.y - vy);
-          if (d < bestDist) {
-            bestDist = d;
-            best = pt.seat;
-          }
-        }
-        if (best && onSelectSeat) {
-          onSelectSeat(best);
-        }
-      })
-      .exec();
+  const changeZoom = ratio => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    viewRef.current = zoomMapView(viewRef.current, ratio, { x: canvas.width / 2, y: canvas.height / 2 }, canvas, mapData);
+    setZoomPercent(Math.round(viewRef.current.zoom * 100));
+    redraw();
+    console.info("[THEATRE_VIEW]", JSON.stringify({ event: "seat-map-zoom", zoom: viewRef.current.zoom }));
   };
 
   if (isWeapp) {
-    return (
-      <View
-        className={`seatmap-wrapper ${expanded ? "expanded" : ""}`.trim()}
-        aria-label={`${floorLabel}选座图`}
-      >
-        <Canvas
-          type="2d"
-          id={canvasId}
-          canvasId={canvasId}
-          className="seatmap-canvas"
-          onTouchEnd={handleWeappTouchEnd}
-        />
+    return <View className="mini-seatmap">
+      <View className={`seatmap-wrapper ${expanded ? "expanded" : ""}`.trim()} aria-label={`${floorLabel}选座图`}>
+        <Canvas type="2d" id={canvasId} canvasId={canvasId} className="seatmap-canvas" disableScroll
+          onTouchStart={handleWeappTouchStart} onTouchMove={handleWeappTouchMove}
+          onTouchEnd={handleWeappTouchEnd} onTouchCancel={() => { gestureRef.current = null; }} />
       </View>
-    );
+      <View className="mini-map-tools">
+        <View id={`${canvasId}-zoom-out`} role="button" aria-label="缩小选座图" className="mini-map-tool" onClick={() => changeZoom(1 / 1.5)}>
+          <LucideIcon name="minus" size={18} color="#53644f" />
+        </View>
+        <Text className="mini-map-scale">{zoomPercent}%</Text>
+        <View id={`${canvasId}-zoom-in`} role="button" aria-label="放大选座图" className="mini-map-tool" onClick={() => changeZoom(1.5)}>
+          <LucideIcon name="plus" size={18} color="#53644f" />
+        </View>
+        <View role="button" aria-label="重置选座图" className="mini-map-tool" onClick={() => changeZoom(1 / viewRef.current.zoom)}>
+          <LucideIcon name="rotate-ccw" size={18} color="#53644f" />
+        </View>
+      </View>
+    </View>;
   }
 
   // H5: render interactive SVG with data-seat attributes & full keyboard/click support
   return (
     <View
-      ref={hostRef}
       className={`seatmap-wrapper ${expanded ? "expanded" : ""}`.trim()}
     >
       <svg
