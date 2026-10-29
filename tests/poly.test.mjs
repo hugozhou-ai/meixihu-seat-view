@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import * as THREE from "three";
 import { makePolyLayout, POLY_ROWS } from "../src/poly-layout.js";
 import { seatEye } from "../src/layout.js";
-import { buildPolyTheatre } from "../dist/src/poly-theatre.js";
+import { buildPolyTheatre } from "../src/poly-theatre.js";
 const seats = makePolyLayout();
 test("Shenzhen published row counts, boxes and pit sum to 1551 independent locations", () => {
   assert.equal(seats.length, 1551);

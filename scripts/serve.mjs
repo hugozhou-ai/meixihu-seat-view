@@ -1,7 +1,15 @@
 import http from "node:http";
 import { readFile } from "node:fs/promises";
 import { resolve, extname } from "node:path";
-const root = resolve(process.argv.includes("--source") ? "." : "dist");
+
+const portArgIndex = process.argv.indexOf("--port");
+const port = Number(
+  (portArgIndex !== -1 && process.argv[portArgIndex + 1]) ||
+    process.env.PORT ||
+    4173,
+);
+const root = resolve(process.argv.includes("--weapp") ? "dist" : "dist-h5");
+
 const types = {
   ".html": "text/html; charset=utf-8",
   ".js": "text/javascript; charset=utf-8",
@@ -12,6 +20,7 @@ const types = {
   ".png": "image/png",
   ".glb": "model/gltf-binary",
 };
+
 const server = http.createServer(async (req, res) => {
   try {
     let name = decodeURIComponent(
@@ -34,6 +43,7 @@ const server = http.createServer(async (req, res) => {
     res.end("Not found");
   }
 });
-server.listen(4173, "127.0.0.1", () =>
-  console.log(JSON.stringify({ local: "http://127.0.0.1:4173", root })),
+
+server.listen(port, "0.0.0.0", () =>
+  console.log(JSON.stringify({ local: `http://127.0.0.1:${port}`, root })),
 );

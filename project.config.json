@@ -1,0 +1,25 @@
+{
+  "miniprogramRoot": "dist/",
+  "projectname": "theatre-seat-view",
+  "description": "剧场座位视角 · 三维重建与逐座观演视角微信小程序",
+  "appid": "touristappid",
+  "setting": {
+    "urlCheck": false,
+    "es6": false,
+    "enhance": false,
+    "compileHotReLoad": false,
+    "postcss": false,
+    "minified": false
+  },
+  "packOptions": {
+    "ignore": [
+      { "type": "file", "value": "index.html" },
+      { "type": "file", "value": "favicon.svg" },
+      { "type": "file", "value": "icons.svg" },
+      { "type": "folder", "value": "js" },
+      { "type": "folder", "value": "css" },
+      { "type": "folder", "value": "chunk" }
+    ]
+  },
+  "compileType": "miniprogram"
+}

@@ -1,19 +1,50 @@
 {
   "name": "theatre-seat-view",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "private": true,
   "type": "module",
+  "description": "探索剧场三维空间，选择座位，查看坐姿观演视角（Taro 微信小程序 & H5）",
+  "templateInfo": {
+    "name": "default",
+    "typescript": false,
+    "css": "none"
+  },
   "scripts": {
+    "prebuild": "node scripts/generate-icons.mjs",
+    "build:weapp": "node scripts/generate-icons.mjs && taro build --type weapp",
+    "dev:weapp": "node scripts/generate-icons.mjs && taro build --type weapp --watch",
+    "build:h5": "node scripts/generate-icons.mjs && taro build --type h5",
+    "dev:h5": "node scripts/generate-icons.mjs && taro build --type h5 --watch",
     "build": "node scripts/build.mjs",
     "test": "node --test tests/*.test.mjs",
     "dev": "node scripts/serve.mjs"
   },
   "dependencies": {
-    "three": "0.180.0",
-    "@awesome.me/webawesome": "3.14.0"
+    "@babel/runtime": "^7.26.0",
+    "@tarojs/components": "4.3.1",
+    "@tarojs/helper": "4.3.1",
+    "@tarojs/plugin-framework-react": "4.3.1",
+    "@tarojs/plugin-platform-h5": "4.3.1",
+    "@tarojs/plugin-platform-weapp": "4.3.1",
+    "@tarojs/react": "4.3.1",
+    "@tarojs/runtime": "4.3.1",
+    "@tarojs/shared": "4.3.1",
+    "@tarojs/taro": "4.3.1",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "three": "0.180.0"
   },
   "devDependencies": {
+    "@babel/core": "^7.26.0",
+    "@babel/preset-env": "^7.26.0",
+    "@babel/preset-react": "^7.25.9",
+    "@tarojs/cli": "4.3.1",
+    "@tarojs/webpack5-runner": "4.3.1",
+    "babel-preset-taro": "4.3.1",
+    "esbuild": "0.28.2",
     "lucide-static": "1.61.0",
-    "esbuild": "0.28.2"
+    "postcss": "^8.4.49",
+    "react-refresh": "^0.14.2",
+    "webpack": "5.91.0"
   }
 }

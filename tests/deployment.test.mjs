@@ -1,63 +1,85 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFile, stat } from "node:fs/promises";
-import { VENUES } from "../dist/src/venues.js";
+import { VENUES } from "../src/venues.js";
+import { ICON_NAMES, iconDataUri } from "../src/icons.js";
 
-const root = new URL("../dist/", import.meta.url);
-const html = await readFile(new URL("index.html", root), "utf8");
+const weappRoot = new URL("../dist/", import.meta.url);
+const h5Root = new URL("../dist-h5/", import.meta.url);
 
-test("all entry assets and transitive modules stay within a project Pages path", async () => {
+test("Taro WeChat Mini Program (weapp) build generates complete miniapp package", async () => {
+  const projectConfig = JSON.parse(
+    await readFile(new URL("../project.config.json", import.meta.url), "utf8"),
+  );
+  assert.equal(projectConfig.miniprogramRoot, "dist/");
+  assert.equal(projectConfig.compileType, "miniprogram");
+
+  const requiredFiles = [
+    "app.json",
+    "app.js",
+    "app.wxss",
+    "base.wxml",
+    "pages/index/index.wxml",
+    "pages/index/index.js",
+    "pages/index/index.json",
+    "vendor/THREE-LICENSE.txt",
+    "vendor/LUCIDE-LICENSE.txt",
+  ];
+  for (const rel of requiredFiles) {
+    const info = await stat(new URL(rel, weappRoot));
+    assert.ok(info.isFile(), `missing weapp artifact: ${rel}`);
+  }
+
+  const appJson = JSON.parse(
+    await readFile(new URL("app.json", weappRoot), "utf8"),
+  );
+  assert.ok(appJson.pages.includes("pages/index/index"));
+  assert.equal(appJson.window.navigationStyle, "custom");
+});
+
+test("Taro H5 build entry assets stay within a relative project path", async () => {
+  const html = await readFile(new URL("index.html", h5Root), "utf8");
   const site = new URL("https://example.github.io/theatre-seat-view/");
-  const imports = JSON.parse(
-    html.match(/<script type="importmap">([\s\S]*?)<\/script>/)[1],
-  ).imports;
   const resources = [...html.matchAll(/(?:src|href)="([^"]+)"/g)]
     .map((m) => m[1])
-    .filter((s) => !s.startsWith("data:"));
-  resources.push(...Object.values(imports));
-  const seen = new Set();
-  async function inspect(specifier, parent) {
-    const url = new URL(
-      imports[specifier] ? new URL(imports[specifier], site) : specifier,
-      parent,
-    );
+    .filter((s) => !s.startsWith("data:") && !s.startsWith("http"));
+
+  assert.ok(resources.length >= 2, "expected relative script/style/icon assets");
+  for (const resource of resources) {
+    const url = new URL(resource, site);
     assert.equal(url.origin, site.origin);
     assert.ok(
       url.pathname.startsWith(site.pathname),
       `asset escapes project path: ${url}`,
     );
     const relative = url.pathname.slice(site.pathname.length);
-    if (!relative || seen.has(relative)) return;
-    seen.add(relative);
-    const file = new URL(relative, root);
-    assert.ok((await stat(file)).isFile(), `missing asset: ${relative}`);
-    if (relative.endsWith(".js")) {
-      const js = await readFile(file, "utf8");
-      for (const m of js.matchAll(
-        /^\s*(?:import|export)\s+(?:[^;]*?\sfrom\s*)?["']([^"']+)["']/gm,
-      )) {
-        await inspect(m[1], url);
-      }
+    if (relative) {
+      const infoH5 = await stat(new URL(relative, h5Root));
+      assert.ok(infoH5.isFile(), `missing H5 asset in dist-h5: ${relative}`);
+      const infoPages = await stat(new URL(relative, weappRoot));
+      assert.ok(infoPages.isFile(), `missing H5 asset in dist (GitHub Pages root): ${relative}`);
     }
   }
-  for (const resource of resources) await inspect(resource, site);
-  assert.ok(seen.has("vendor/three.core.js"));
-  assert.ok(seen.has("src/traced-seating.js"));
 });
 
-test("every venue reference resolves inside the Pages project", async () => {
+test("every venue reference and Lucide icon resolves in both weapp and h5 outputs", async () => {
   assert.equal(VENUES.length, 2);
-  const module = new URL(
-    "https://example.github.io/theatre-seat-view/src/app.js",
-  );
   for (const venue of VENUES) {
     assert.ok(venue.references.length >= 4);
     const seats = venue.makeLayout();
     assert.ok(seats.some((s) => s.seatId === venue.defaultSeat));
     for (const ref of venue.references) {
-      const asset = new URL("../reference/" + ref.file, module);
-      assert.ok(asset.pathname.startsWith("/theatre-seat-view/reference/"));
-      assert.ok((await stat(new URL("reference/" + ref.file, root))).isFile());
+      assert.ok(
+        (await stat(new URL("reference/" + ref.file, weappRoot))).isFile(),
+      );
+      assert.ok(
+        (await stat(new URL("reference/" + ref.file, h5Root))).isFile(),
+      );
     }
+  }
+
+  for (const name of ICON_NAMES) {
+    const uri = iconDataUri(name, "#eee9df");
+    assert.ok(uri.startsWith("data:image/svg+xml;utf8,"));
   }
 });

@@ -12,31 +12,42 @@ import { ROW_COUNTS, BALCONY_PARAMETERS, balconyHeight, STAGE } from "./layout.j
 import { buildStageActors } from "./stage-actors.js";
 const TAU = Math.PI * 2;
 function woodTexture() {
-  const canvas = document.createElement("canvas");
-  canvas.width = 1024;
-  canvas.height = 256;
-  const c = canvas.getContext("2d");
-  c.fillStyle = "#9c6e45";
-  c.fillRect(0, 0, 1024, 256);
+  const width = 256;
+  const height = 64;
+  const data = new Uint8Array(width * height * 4);
   let seed = 71;
   const rand = () => {
     seed = (seed * 1664525 + 1013904223) >>> 0;
     return seed / 4294967296;
   };
-  for (let j = 0; j < 1100; j++) {
-    const y = rand() * 256;
-    c.strokeStyle = `rgba(${rand() > 0.5 ? "52,24,12" : "221,181,126"},${0.018 + rand() * 0.07})`;
-    c.lineWidth = 0.3 + rand() * 0.8;
-    c.beginPath();
-    c.moveTo(0, y);
-    for (let x = 0; x <= 1024; x += 25)
-      c.lineTo(x, y + Math.sin(x * 0.015 + j) * (0.2 + rand() * 2));
-    c.stroke();
+  for (let i = 0; i < width * height; i++) {
+    const idx = i * 4;
+    data[idx] = 156;
+    data[idx + 1] = 110;
+    data[idx + 2] = 69;
+    data[idx + 3] = 255;
   }
-  const t = new THREE.CanvasTexture(canvas);
+  for (let j = 0; j < 260; j++) {
+    const baseY = rand() * height;
+    const dark = rand() > 0.5;
+    const sr = dark ? 52 : 221;
+    const sg = dark ? 24 : 181;
+    const sb = dark ? 12 : 126;
+    const alpha = 0.04 + rand() * 0.1;
+    const amp = 0.2 + rand() * 1.5;
+    for (let x = 0; x < width; x++) {
+      const y = Math.max(0, Math.min(height - 1, Math.round(baseY + Math.sin(x * 0.06 + j) * amp)));
+      const idx = (y * width + x) * 4;
+      data[idx] = Math.round(data[idx] * (1 - alpha) + sr * alpha);
+      data[idx + 1] = Math.round(data[idx + 1] * (1 - alpha) + sg * alpha);
+      data[idx + 2] = Math.round(data[idx + 2] * (1 - alpha) + sb * alpha);
+    }
+  }
+  const t = new THREE.DataTexture(data, width, height, THREE.RGBAFormat);
   t.colorSpace = THREE.SRGBColorSpace;
   t.wrapS = t.wrapT = THREE.RepeatWrapping;
   t.repeat.set(5, 1);
+  t.needsUpdate = true;
   return t;
 }
 export function buildTheatre(seats) {

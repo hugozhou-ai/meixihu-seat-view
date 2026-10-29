@@ -1,4 +1,7 @@
 node_modules/
+dist-h5/
+.swc/
 .DS_Store
 work/
 *.log
+theatre-seat-view-weapp.zip

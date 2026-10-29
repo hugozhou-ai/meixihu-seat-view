@@ -1,6 +1,6 @@
 import * as THREE from "three";
-import { RoundedBoxGeometry } from "../vendor/RoundedBoxGeometry.js";
-import { mergeGeometries } from "../vendor/BufferGeometryUtils.js";
+import { RoundedBoxGeometry } from "three/examples/jsm/geometries/RoundedBoxGeometry.js";
+import { mergeGeometries } from "three/examples/jsm/utils/BufferGeometryUtils.js";
 export const box = (x, y, z) => new THREE.BoxGeometry(x, y, z);
 const originalMatrices = new WeakMap();
 export function addSeating(root, seats, { seatMat, backMat, darkWood }) {
