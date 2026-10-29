@@ -2,8 +2,8 @@ import React from "react";
 import { View, Text, ScrollView } from "@tarojs/components";
 import { LucideIcon, PickerSelect, SegmentedTabs } from "./ui.jsx";
 
-function Tool({ id, icon, label, onClick, active = false }) {
-  return <View id={id} role="button" aria-label={label} aria-pressed={active}
+function Tool({ id, icon, label, ariaLabel = label, onClick, active = false }) {
+  return <View id={id} role="button" aria-label={ariaLabel} aria-pressed={active}
     className={`mini-tool ${active ? "active" : ""}`} onClick={e => {
       console.info("[THEATRE_VIEW]", JSON.stringify({ event: "mobile-action", id }));
       onClick(e);
@@ -78,7 +78,9 @@ export function MiniControls({
         {perspective === "seat" && <Tool id="map-expand" icon="expand" label="选座图" onClick={onOpenMap} />}
         <Tool id="reset-view" icon="rotate-ccw" label="复位" onClick={onReset} />
         <Tool id="look-back" icon="armchair" label="回望" onClick={onLookBack} />
-        <Tool id="lighting-toggle" icon="sun" label="灯光" active={lighting === "show"} onClick={onLighting} />
+        <Tool id="lighting-toggle" icon="sun" label={lighting === "show" ? "开厅灯" : "关厅灯"}
+          ariaLabel={lighting === "show" ? "打开观众厅灯光" : "关闭观众厅灯光，保留舞台照明"}
+          active={lighting === "house"} onClick={onLighting} />
         <Tool id="settings-open" icon="settings-2" label="设置" onClick={onSettings} />
         <Tool id="panel-toggle" icon={panelCollapsed ? "plus" : "minus"}
           label={panelCollapsed ? "展开选座" : "收起选座"} active={!panelCollapsed} onClick={togglePanel} />

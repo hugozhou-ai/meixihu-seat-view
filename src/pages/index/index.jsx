@@ -1324,7 +1324,8 @@ export default function IndexPage() {
     setLighting(next);
     engineRef.current.lighting = next;
     engineRef.current.theatre?.setLighting(next);
-    showToast(next === "show" ? "已切换演出灯光" : "已切换观众厅灯光");
+    logEvent("house-lighting-changed", { houseLightsOn: next === "house", stageLightsOn: true });
+    showToast(next === "show" ? "观众厅灯光已关闭，舞台照明保持开启" : "观众厅灯光已打开");
   };
 
   const handlePitToggle = (checked) => {
@@ -1923,8 +1924,8 @@ export default function IndexPage() {
         <View
           id="lighting-toggle"
           role="button"
-          aria-label={lighting === "show" ? "演出灯光" : "观众厅灯光"}
-          aria-pressed={lighting === "show"}
+          aria-label={lighting === "show" ? "打开观众厅灯光" : "关闭观众厅灯光，保留舞台照明"}
+          aria-pressed={lighting === "house"}
           className="tool-button"
           onClick={handleLightingToggle}
         >

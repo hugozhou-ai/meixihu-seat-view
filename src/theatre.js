@@ -10,6 +10,7 @@ import {
 } from "./theatre-common.js";
 import { ROW_COUNTS, BALCONY_PARAMETERS, balconyHeight, STAGE } from "./layout.js";
 import { buildStageActors } from "./stage-actors.js";
+import { buildTheatreLighting } from "./theatre-lighting.js";
 const TAU = Math.PI * 2;
 function woodTexture() {
   const width = 256;
@@ -626,21 +627,8 @@ export function buildTheatre(seats) {
   batchGroup(overhead);
   batchGroup(walls);
   batchGroup(architecture);
-  const lightGroup = new THREE.Group();
-  lightGroup.name = "Theatre_Lighting";
-  root.add(lightGroup);
-  lightGroup.add(new THREE.HemisphereLight("#ffe9da", "#625044", 2.8));
-  const key = new THREE.DirectionalLight("#ffddb2", 3.0);
-  key.position.set(0, 16, 6);
-  lightGroup.add(key);
-  const fill = new THREE.DirectionalLight("#b6c9e3", 1.5);
-  fill.position.set(-12, 9, -7);
-  lightGroup.add(fill);
-  for (const [x, y, z, intensity] of [[0, 10, -5, 90]]) {
-    const l = new THREE.PointLight("#ffce99", intensity, 38, 2);
-    l.position.set(x, y, z);
-    lightGroup.add(l);
-  }
+  const lighting = buildTheatreLighting(STAGE, { warm: "#ffe9da", ground: "#625044" });
+  root.add(lighting.root);
   // Selected-seat location ring, never an occluder of the seated camera.
   const marker = new THREE.Mesh(
     new THREE.TorusGeometry(0.4, 0.035, 6, 40),
@@ -667,12 +655,6 @@ export function buildTheatre(seats) {
       walls.visible = !v;
       marker.visible = v;
     },
-    setLighting(mode) {
-      const isShow = mode === "show";
-      key.intensity = isShow ? 0.6 : 3.0;
-      fill.intensity = isShow ? 0.5 : 1.5;
-      lightGroup.children[0].intensity = isShow ? 0.7 : 2.8;
-      strip.emissiveIntensity = isShow ? 3.5 : 2.2;
-    },
+    setLighting: lighting.setLighting,
   };
 }

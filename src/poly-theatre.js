@@ -10,6 +10,7 @@ import {
 } from "./theatre-common.js";
 import { POLY_ROWS, polyRowGeometry, POLY_STAGE } from "./poly-layout.js";
 import { buildStageActors } from "./stage-actors.js";
+import { buildTheatreLighting } from "./theatre-lighting.js";
 export function buildPolyTheatre(seats) {
   const root = new THREE.Group();
   root.name = "Shenzhen_Poly_Theatre_Interior";
@@ -391,17 +392,8 @@ export function buildPolyTheatre(seats) {
   batchGroup(overhead);
   batchGroup(walls);
   batchGroup(architecture);
-  const lights = new THREE.Group();
-  root.add(lights);
-  const ambient = new THREE.HemisphereLight("#ffe5bf", "#4a4641", 2.4),
-    key = new THREE.DirectionalLight("#ffdfb0", 2.8),
-    fill = new THREE.DirectionalLight("#dce4ee", 1.4);
-  key.position.set(0, 15, 4);
-  fill.position.set(-12, 12, 25);
-  lights.add(ambient, key, fill);
-  const stageLight = new THREE.PointLight("#ffdfbc", 80, 32, 2);
-  stageLight.position.set(0, 8, -5);
-  lights.add(stageLight);
+  const lighting = buildTheatreLighting(POLY_STAGE, { warm: "#ffe5bf", ground: "#4a4641" });
+  root.add(lighting.root);
   const marker = new THREE.Mesh(
     new THREE.TorusGeometry(0.4, 0.035, 6, 40),
     new THREE.MeshBasicMaterial({ color: "#64d8c1", depthTest: false }),
@@ -426,11 +418,6 @@ export function buildPolyTheatre(seats) {
       walls.visible = !v;
       marker.visible = v;
     },
-    setLighting(mode) {
-      const show = mode === "show";
-      ambient.intensity = show ? 0.65 : 2.4;
-      key.intensity = show ? 0.6 : 2.8;
-      fill.intensity = show ? 0.5 : 1.4;
-    },
+    setLighting: lighting.setLighting,
   };
 }
